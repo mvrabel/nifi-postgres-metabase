@@ -1,6 +1,6 @@
 # NiFi ETL Template
 
-## Work in progress
+## Work in progress - Template is complete - documentation is WIP
 
 Template for using NiFi as **batch ingest tool** and **orchestrator** for **Data Warehouses**.
 
