@@ -1,0 +1,28 @@
+version: '3.7'
+services:
+#  Create a service named db.
+  postgres:
+    image: "postgres:12"
+    restart: always
+    container_name: "postgres"
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=test
+    volumes:
+    - db_data:/var/lib/postgresql/data
+      
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    depends_on:
+    - postgres
+    environment:
+      PGADMIN_DEFAULT_EMAIL: test
+      PGADMIN_DEFAULT_PASSWORD: test
+    ports:
+    - 8080:80
+
+volumes:
+  db_data:
