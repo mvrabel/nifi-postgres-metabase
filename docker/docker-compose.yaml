@@ -1,23 +1,22 @@
 version: '3.7'
 services:
-#  Create a service named db.
-  postgres:
-    image: "postgres:12"
+  dwh:
+    image: "postgres:11"
     restart: always
-    container_name: "postgres"
+    container_name: dwh
     environment:
       - POSTGRES_USER=test
       - POSTGRES_PASSWORD=test
       - POSTGRES_DB=test
+    ports:
+      - 5432:5432
     volumes:
     - db_data:/var/lib/postgresql/data
       
   pgadmin:
     container_name: pgadmin
-    image: dpage/pgadmin4
+    image: "dpage/pgadmin4:4.13"
     restart: always
-    depends_on:
-    - postgres
     environment:
       PGADMIN_DEFAULT_EMAIL: test
       PGADMIN_DEFAULT_PASSWORD: test
