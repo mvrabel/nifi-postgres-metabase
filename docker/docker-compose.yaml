@@ -1,27 +1,50 @@
 version: '3.7'
+
 services:
-  dwh:
-    image: "postgres:11"
+  nifi:
+    image: apache/nifi:1.9.2
+    container_name: nifi
     restart: always
-    container_name: dwh
     environment:
-      - POSTGRES_USER=test
-      - POSTGRES_PASSWORD=test
-      - POSTGRES_DB=test
+      - NIFI_HOME=/opt/nifi/nifi-current
+      - NIFI_LOG_DIR=/opt/nifi/nifi-current/logs
+      - NIFI_PID_DIR=/opt/nifi/nifi-current/run
+      - NIFI_BASE_DIR=/opt/nifi
+      - NIFI_WEB_HTTP_PORT=8080
+    ports:
+      - 8080:8080
+    volumes:
+      - nifi:/opt/nifi/nifi-current/state
+      - nifi:/opt/nifi/nifi-current/database_repository
+      - nifi:/opt/nifi/nifi-current/flowfile_repository
+      - nifi:/opt/nifi/nifi-current/content_repository
+      - nifi:/opt/nifi/nifi-current/provenance_repository   
+  postgres:
+    image: postgres:11
+    container_name: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=changeit
     ports:
       - 5432:5432
     volumes:
-    - db_data:/var/lib/postgresql/data
-      
+      - postgres:/var/lib/postgresql/data
   pgadmin:
     container_name: pgadmin
     image: "dpage/pgadmin4:4.13"
     restart: always
     environment:
-      PGADMIN_DEFAULT_EMAIL: test
-      PGADMIN_DEFAULT_PASSWORD: test
+      - PGADMIN_DEFAULT_EMAIL=admin
+      - PGADMIN_DEFAULT_PASSWORD=admin
     ports:
-    - 8080:80
-
+    - "8090:80"
+  openldap:
+    image: osixia/openldap:1.2.5
+    container_name: openldap
+    restart: always
+    ports:
+      - 38999:389
+  
 volumes:
-  db_data:
+  postgres:
+  nifi:
