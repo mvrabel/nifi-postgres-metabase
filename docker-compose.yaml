@@ -1,4 +1,4 @@
-version: '3.7'
+version: "3.7"
 
 services:
   nifi:
@@ -20,7 +20,7 @@ services:
       - nifi:/opt/nifi/nifi-current/content_repository
       - nifi:/opt/nifi/nifi-current/provenance_repository   
   postgres:
-    image: postgres:11
+    image: koroslak/postgres:latest
     container_name: postgres
     restart: always
     environment:
@@ -31,13 +31,13 @@ services:
       - postgres:/var/lib/postgresql/data
   pgadmin:
     container_name: pgadmin
-    image: "dpage/pgadmin4:4.13"
+    image: dpage/pgadmin4:4.13
     restart: always
     environment:
       - PGADMIN_DEFAULT_EMAIL=admin
       - PGADMIN_DEFAULT_PASSWORD=admin
     ports:
-    - "8090:80"
+      - 8090:80
   openldap:
     image: osixia/openldap:1.2.5
     container_name: openldap
