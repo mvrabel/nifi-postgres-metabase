@@ -106,7 +106,7 @@ CREATE TABLE stage.jira_project_i (
     name text NOT NULL,
     tech_data_load_uuid text NOT NULL,
     tech_data_load_utc_timestamp bigint NOT NULL
-);
+);  
 
 
 

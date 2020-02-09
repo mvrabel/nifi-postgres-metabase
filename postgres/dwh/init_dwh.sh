@@ -6,7 +6,7 @@ function log() {
   echo $1 >> $logfile
 }
 
-LOG "INFO: Start $(date +%Y%m%d_%H%M%S)" > $logfile 
+log "INFO: Start $(date +%Y%m%d_%H%M%S)" > $logfile 
 
 
 # Add users
