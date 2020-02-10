@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   nifi:
-    image: apache/nifi:latest
+    image: koroslak/nifi:latest
     container_name: nifi
     restart: always
     environment:
@@ -60,7 +60,7 @@ services:
       - postgres
 
   openldap:
-    image: osixia/openldap:1.2.5
+    image: osixia/openldap:1.3.0
     container_name: openldap
     restart: always
     ports:
