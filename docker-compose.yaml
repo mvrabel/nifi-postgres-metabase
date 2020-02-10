@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   nifi:
-    image: apache/nifi:1.9.2
+    image: apache/nifi:latest
     container_name: nifi
     restart: always
     environment:
@@ -17,20 +17,22 @@ services:
       - openldap
     volumes:
       - nifi:/opt/nifi/nifi-current/state
-      - nifi:/opt/nifi/nifi-current/database_repository
-      - nifi:/opt/nifi/nifi-current/flowfile_repository
-      - nifi:/opt/nifi/nifi-current/content_repository
-      - nifi:/opt/nifi/nifi-current/provenance_repository   
+      - nifi:/opt/nifi/nifi-current/repositories/database_repository
+      - nifi:/opt/nifi/nifi-current/repositories/flowfile_repository
+      - nifi:/opt/nifi/nifi-current/repositories/content_repository
+      - nifi:/opt/nifi/nifi-current/repositories/provenance_repository
+
   postgres:
     image: koroslak/postgres:latest
     container_name: postgres
     restart: always
     environment:
-      - POSTGRES_PASSWORD=changeit
+      - POSTGRES_PASSWORD=secret123
     ports:
       - 5432:5432
     volumes:
       - postgres:/var/lib/postgresql/data
+      
   pgadmin:
     container_name: pgadmin
     image: dpage/pgadmin4:4.13
@@ -43,8 +45,15 @@ services:
 
   metabase:
     container_name: metabase
-    image: metabase/metabase:v0.33.3
+    image: metabase/metabase:latest
     restart: always
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabase
+      MB_DB_PORT: 5432
+      MB_DB_USER: metabase_admin
+      MB_DB_PASS: secret123
+      MB_DB_HOST: postgres
     ports:
       - 3000:3000
     depends_on:
@@ -60,3 +69,7 @@ services:
 volumes:
   postgres:
   nifi:
+  openldap:
+  metabase:
+  pgadmin:
+ 
