@@ -1,22 +1,30 @@
-# NiFi ETL Template
+# Parts of this framework
 
-## Work in progress - Template is complete - documentation is WIP
+## NiFi
+* Fetch data
+* Store them in Postgres
+* Execute Postgres stored procedures
+* Single point of scheduling/dataflow
+## Postgres
+* Data store - staging
+* Clean integrated data - core
+* Reports - mart
+* \+Transformations between areas
+## Metabase
+* View Reports/tables stored in mart
+* Make aggregates/filters
+* Share them via URLs
 
-Template for using NiFi as **batch ingest tool** and **orchestrator** for **Data Warehouses**.
+# NiFi
+- I'm using NiFi as a **batch ingest tool** and **orchestrator** for **Data Warehouse**.
 
-|  Abbreviation |     Full Name |
-|           --- |           --- |
-|            FF |      Flow File|
-|            PG | Process Group |
-
-### Principles
+## Principles
 From 2 years of working and trying to make workflow as generic, modularized and simple to understadnd here are my principles I used to archive it.
-1. Every logical step should output only 1 FF. e.g. One PG that ingests data from a source system and outputs one flow file into success or error connection.
+1. Every logical step should output only 1 flow file. e.g. One Processor group that ingests data from a source system and outputs one flow file into success or error connection.
 1. Speficy credentials only once. e.g. If you use InvokeHTTP processor, create a workflow so that there won't be 2 InvokeHTTP processors with the same credentials set.
-1. If you can, create a PG that will act as a blackbox. Show the user what's going on without going to unnecessary detail.
+1. If you can, create a Processor group that will act as a blackbox. Show the user what's going on without going to unnecessary detail.
 
-
-### Naming Convention:
+## Naming Convention:
 |          Component|                  Naming Convention |                           Note | 
 |               --- |                                --- |                            --- |
 | flow file attriute|                     lowerCamelCase |          thisIsAnExampleForYou |
@@ -27,16 +35,15 @@ From 2 years of working and trying to make workflow as generic, modularized and 
 |       connection  | success, error (whenever possible) | breaking rule example: Parsing log files and routing each line on log level: Info, Warn, Error |
 
 
-### Description of the database schema this NiFi workflow relies on.
-I used Postgres.
-#### 3 schemas
+# Postgres
+## 3 schemas
 |  Name |                                                Usage |
 |   --- |                                                  --- |
 | stage | here are data loaded _**as is**_ from source systems |
 |  core |               cleaned integrated (foreign keys) data |
 |  mart |                            very flat tables, reports |
 
-#### 4 table types (defined by postfixes)
+### 4 table types (defined by postfixes)
 |            Postfix |                                Name |                                                usage | 
 |                --- |                                 --- |                                                  --- |
 |                \_i | input                               |              contains temporary data used during etl |
