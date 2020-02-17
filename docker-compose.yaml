@@ -35,7 +35,7 @@ services:
       
   pgadmin:
     container_name: pgadmin
-    image: dpage/pgadmin4:4.13
+    image: dpage/pgadmin4:4.18
     restart: always
     environment:
       - PGADMIN_DEFAULT_EMAIL=admin
@@ -45,7 +45,7 @@ services:
 
   metabase:
     container_name: metabase
-    image: metabase/metabase:latest
+    image: metabase/metabase:v0.34.2
     restart: always
     environment:
       MB_DB_TYPE: postgres
