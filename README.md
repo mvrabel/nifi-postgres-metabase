@@ -8,11 +8,11 @@ Done :)
 
 | Container|                       Link |         Credentials |                                                       Note |
 |      --- |                        --- |                 --- |                                                        --- |
-| NiFi     |  http://127.0.0.1:8080/nifi| None                |                                                            |
+| NiFi     |  http://127.0.0.1:8080/nifi| None                | TODO: OpenLDAP in the future                               |
 | Postgres |  http://127.0.0.1:5432     | postgres:secret123  | to view the schema I added a https://dbschema.com/ project | 
 | Metabase |  http://127.0.0.1:3000     | You create your own |                                                            |
 | PgAdmin  |  http://127.0.0.1:8090     | admin:admin         |                                                            |
-| openldap |  localhost:38999 (No Auth) | None                |                                                            |
+| openldap |  localhost:38999 (No Auth) | None                | TODO: Add credentials                                      |
 
 # Parts of this framework
 
