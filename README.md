@@ -1,3 +1,19 @@
+# How to run it
+
+1.From root folder run.
+`docker-compose up`
+1.Wait until all containers are running.
+
+Done :)
+
+| Container|                       Link |         Credentials |                                                       Note |
+|      --- |                        --- |                 --- |                                                        --- |
+| NiFi     |  http://127.0.0.1:8080/nifi| None                |                                                            |
+| Postgres |  http://127.0.0.1:5432     | postgres:secret123  | to view the schema I added a https://dbschema.com/ project | 
+| Metabase |  http://127.0.0.1:3000     | You create your own |                                                            |
+| PgAdmin  |  http://127.0.0.1:8090     | admin:admin         |                                                            |
+| openldap |  localhost:38999 (No Auth) | None                |                                                            |
+
 # Parts of this framework
 
 ## NiFi
