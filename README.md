@@ -1,8 +1,8 @@
 # How to run it
 
-1.From root folder run.
+1. From root folder run.
 `docker-compose up`
-1.Wait until all containers are running.
+1. Wait until the containers are running.
 
 Done :)
 
@@ -14,19 +14,19 @@ Done :)
 | PgAdmin  |  http://127.0.0.1:8090     | admin:admin         |                                                            |
 | openldap |  localhost:38999 (No Auth) | None                | TODO: Add credentials                                      |
 
-# Parts of this framework
+# Core Components
 
-## NiFi
+### NiFi
 * Fetch data
 * Store them in Postgres
 * Execute Postgres stored procedures
 * Single point of scheduling/dataflow
-## Postgres
+### Postgres
 * Data store - staging
 * Clean integrated data - core
 * Reports - mart
 * \+Transformations between areas
-## Metabase
+### Metabase
 * View Reports/tables stored in mart
 * Make aggregates/filters
 * Share them via URLs
@@ -52,7 +52,7 @@ From 2 years of working and trying to make workflow as generic, modularized and 
 
 
 # Postgres
-## 3 schemas
+### 3 schemas
 |  Name |                                                Usage |
 |   --- |                                                  --- |
 | stage | here are data loaded _**as is**_ from source systems |
@@ -67,3 +67,5 @@ From 2 years of working and trying to make workflow as generic, modularized and 
 |               \_ih | input historized                    |                     scd2 historization of \_i tables |
 |                \_d | exact copy (snapshot) of \_i tables |                                               backup |
 | _withoput_postfix_ |                              report |  **Only in mart schema** (will be changed to **\_r**)|
+
+# Metabase
