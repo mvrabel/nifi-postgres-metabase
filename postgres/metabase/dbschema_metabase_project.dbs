@@ -1,0 +1,1555 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="OpenBI-metabase" id="Project_210bc85" template="Default" database="PostgreSQL" >
+	<schema name="information_schema" catalogname="metabase" schemaname="information_schema" />
+	<schema name="public" catalogname="metabase" schemaname="public" >
+		<table name="activity" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="topic" type="varchar" length="32" decimal="0" jt="12" mandatory="y" />
+			<column name="timestamp" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="user_id" type="integer" length="10" decimal="0" jt="4" />
+			<column name="model" type="varchar" length="16" decimal="0" jt="12" />
+			<column name="model_id" type="integer" length="10" decimal="0" jt="4" />
+			<column name="database_id" type="integer" length="10" decimal="0" jt="4" />
+			<column name="table_id" type="integer" length="10" decimal="0" jt="4" />
+			<column name="custom_id" type="varchar" length="48" decimal="0" jt="12" />
+			<column name="details" type="varchar" decimal="0" jt="12" mandatory="y" />
+			<index name="activity_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_activity_custom_id" unique="NORMAL" >
+				<column name="custom_id" />
+			</index>
+			<index name="idx_activity_timestamp" unique="NORMAL" >
+				<column name="timestamp" />
+			</index>
+			<index name="idx_activity_user_id" unique="NORMAL" >
+				<column name="user_id" />
+			</index>
+			<fk name="fk_activity_ref_user_id" to_schema="public" to_table="core_user" >
+				<fk_column name="user_id" pk="id" />
+			</fk>
+		</table>
+		<table name="card_label" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="card_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="label_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<index name="card_label_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="unique_card_label_card_id_label_id" unique="UNIQUE" >
+				<column name="card_id" />
+				<column name="label_id" />
+			</index>
+			<index name="idx_card_label_card_id" unique="NORMAL" >
+				<column name="card_id" />
+			</index>
+			<index name="idx_card_label_label_id" unique="NORMAL" >
+				<column name="label_id" />
+			</index>
+			<fk name="fk_card_label_ref_label_id" to_schema="public" to_table="label" >
+				<fk_column name="label_id" pk="id" />
+			</fk>
+			<fk name="fk_card_label_ref_card_id" to_schema="public" to_table="report_card" >
+				<fk_column name="card_id" pk="id" />
+			</fk>
+		</table>
+		<table name="collection" >
+			<comment><![CDATA[Collections are an optional way to organize Cards and handle permissions for them.]]></comment>
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="name" type="text" decimal="0" jt="12" mandatory="y" >
+				<comment><![CDATA[The user-facing name of this Collection.]]></comment>
+			</column>
+			<column name="description" type="text" decimal="0" jt="12" >
+				<comment><![CDATA[Optional description for this Collection.]]></comment>
+			</column>
+			<column name="color" type="char" length="7" decimal="0" jt="1" mandatory="y" >
+				<comment><![CDATA[Seven-character hex color for this Collection, including the preceding hash sign.]]></comment>
+			</column>
+			<column name="archived" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+				<comment><![CDATA[Whether this Collection has been archived and should be hidden from users.]]></comment>
+			</column>
+			<column name="location" type="varchar" length="254" decimal="0" jt="12" mandatory="y" >
+				<defo>&#039;/&#039;::character varying</defo>
+				<comment><![CDATA[Directory-structure path of ancestor Collections. e.g. "/1/2/" means our Parent is Collection 2, and their parent is Collection 1.]]></comment>
+			</column>
+			<column name="personal_owner_id" type="integer" length="10" decimal="0" jt="4" >
+				<comment><![CDATA[If set, this Collection is a personal Collection, for exclusive use of the User with this ID.]]></comment>
+			</column>
+			<column name="slug" type="varchar" length="254" decimal="0" jt="12" mandatory="y" >
+				<comment><![CDATA[Sluggified version of the Collection name. Used only for display purposes in URL; not unique or indexed.]]></comment>
+			</column>
+			<index name="collection_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_collection_location" unique="NORMAL" >
+				<column name="location" />
+			</index>
+			<index name="idx_collection_personal_owner_id" unique="NORMAL" >
+				<column name="personal_owner_id" />
+			</index>
+			<fk name="fk_collection_personal_owner_id" to_schema="public" to_table="core_user" >
+				<fk_column name="personal_owner_id" pk="id" />
+			</fk>
+		</table>
+		<table name="collection_revision" >
+			<comment><![CDATA[Used to keep track of changes made to collections.]]></comment>
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="before" type="text" decimal="0" jt="12" mandatory="y" >
+				<comment><![CDATA[Serialized JSON of the collections graph before the changes.]]></comment>
+			</column>
+			<column name="after" type="text" decimal="0" jt="12" mandatory="y" >
+				<comment><![CDATA[Serialized JSON of the collections graph after the changes.]]></comment>
+			</column>
+			<column name="user_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" >
+				<comment><![CDATA[The ID of the admin who made this set of changes.]]></comment>
+			</column>
+			<column name="created_at" type="timestamp" length="29" decimal="6" jt="93" mandatory="y" >
+				<comment><![CDATA[The timestamp of when these changes were made.]]></comment>
+			</column>
+			<column name="remark" type="text" decimal="0" jt="12" >
+				<comment><![CDATA[Optional remarks explaining why these changes were made.]]></comment>
+			</column>
+			<index name="collection_revision_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_collection_revision_user_id" to_schema="public" to_table="core_user" >
+				<fk_column name="user_id" pk="id" />
+			</fk>
+		</table>
+		<table name="computation_job" >
+			<comment><![CDATA[Stores submitted async computation jobs.]]></comment>
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="creator_id" type="integer" length="10" decimal="0" jt="4" />
+			<column name="created_at" type="timestamp" length="29" decimal="6" jt="93" mandatory="y" />
+			<column name="updated_at" type="timestamp" length="29" decimal="6" jt="93" mandatory="y" />
+			<column name="type" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="status" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="context" type="text" decimal="0" jt="12" />
+			<column name="ended_at" type="timestamp" length="29" decimal="6" jt="93" />
+			<index name="computation_job_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_computation_job_ref_user_id" to_schema="public" to_table="core_user" >
+				<fk_column name="creator_id" pk="id" />
+			</fk>
+		</table>
+		<table name="computation_job_result" >
+			<comment><![CDATA[Stores results of async computation jobs.]]></comment>
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="job_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="created_at" type="timestamp" length="29" decimal="6" jt="93" mandatory="y" />
+			<column name="updated_at" type="timestamp" length="29" decimal="6" jt="93" mandatory="y" />
+			<column name="permanence" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="payload" type="text" decimal="0" jt="12" mandatory="y" />
+			<index name="computation_job_result_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_computation_result_ref_job_id" to_schema="public" to_table="computation_job" >
+				<fk_column name="job_id" pk="id" />
+			</fk>
+		</table>
+		<table name="core_session" >
+			<column name="id" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="user_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="created_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<index name="core_session_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_session_ref_user_id" to_schema="public" to_table="core_user" >
+				<fk_column name="user_id" pk="id" />
+			</fk>
+		</table>
+		<table name="core_user" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="email" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="first_name" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="last_name" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="password" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="password_salt" type="varchar" length="254" decimal="0" jt="12" mandatory="y" >
+				<defo>&#039;default&#039;::character varying</defo>
+			</column>
+			<column name="date_joined" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="last_login" type="timestamptz" length="35" decimal="6" jt="93" />
+			<column name="is_superuser" type="bool" length="1" decimal="0" jt="-7" mandatory="y" />
+			<column name="is_active" type="bool" length="1" decimal="0" jt="-7" mandatory="y" />
+			<column name="reset_token" type="varchar" length="254" decimal="0" jt="12" />
+			<column name="reset_triggered" type="bigint" length="19" decimal="0" jt="-5" />
+			<column name="is_qbnewb" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>true</defo>
+			</column>
+			<column name="google_auth" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+			</column>
+			<column name="ldap_auth" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+			</column>
+			<column name="login_attributes" type="text" decimal="0" jt="12" >
+				<comment><![CDATA[JSON serialized map with attributes used for row level permissions]]></comment>
+			</column>
+			<column name="updated_at" type="timestamp" length="29" decimal="6" jt="93" >
+				<comment><![CDATA[When was this User last updated?]]></comment>
+			</column>
+			<index name="core_user_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="core_user_email_key" unique="UNIQUE" >
+				<column name="email" />
+			</index>
+		</table>
+		<table name="dashboard_favorite" >
+			<comment><![CDATA[Presence of a row here indicates a given User has favorited a given Dashboard.]]></comment>
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="user_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" >
+				<comment><![CDATA[ID of the User who favorited the Dashboard.]]></comment>
+			</column>
+			<column name="dashboard_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" >
+				<comment><![CDATA[ID of the Dashboard favorited by the User.]]></comment>
+			</column>
+			<index name="dashboard_favorite_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="unique_dashboard_favorite_user_id_dashboard_id" unique="UNIQUE" >
+				<column name="user_id" />
+				<column name="dashboard_id" />
+			</index>
+			<index name="idx_dashboard_favorite_dashboard_id" unique="NORMAL" >
+				<column name="dashboard_id" />
+			</index>
+			<index name="idx_dashboard_favorite_user_id" unique="NORMAL" >
+				<column name="user_id" />
+			</index>
+			<fk name="fk_dashboard_favorite_user_id" to_schema="public" to_table="core_user" delete_action="cascade" >
+				<fk_column name="user_id" pk="id" />
+			</fk>
+			<fk name="fk_dashboard_favorite_dashboard_id" to_schema="public" to_table="report_dashboard" delete_action="cascade" >
+				<fk_column name="dashboard_id" pk="id" />
+			</fk>
+		</table>
+		<table name="dashboardcard_series" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="dashboardcard_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="card_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="position" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<index name="dashboardcard_series_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_dashboardcard_series_card_id" unique="NORMAL" >
+				<column name="card_id" />
+			</index>
+			<index name="idx_dashboardcard_series_dashboardcard_id" unique="NORMAL" >
+				<column name="dashboardcard_id" />
+			</index>
+			<fk name="fk_dashboardcard_series_ref_card_id" to_schema="public" to_table="report_card" >
+				<fk_column name="card_id" pk="id" />
+			</fk>
+			<fk name="fk_dashboardcard_series_ref_dashboardcard_id" to_schema="public" to_table="report_dashboardcard" >
+				<fk_column name="dashboardcard_id" pk="id" />
+			</fk>
+		</table>
+		<table name="data_migrations" >
+			<column name="id" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="timestamp" type="timestamp" length="29" decimal="6" jt="93" mandatory="y" />
+			<index name="data_migrations_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+		</table>
+		<table name="databasechangelog" >
+			<column name="id" type="varchar" length="255" decimal="0" jt="12" mandatory="y" />
+			<column name="author" type="varchar" length="255" decimal="0" jt="12" mandatory="y" />
+			<column name="filename" type="varchar" length="255" decimal="0" jt="12" mandatory="y" />
+			<column name="dateexecuted" type="timestamp" length="29" decimal="6" jt="93" mandatory="y" />
+			<column name="orderexecuted" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="exectype" type="varchar" length="10" decimal="0" jt="12" mandatory="y" />
+			<column name="md5sum" type="varchar" length="35" decimal="0" jt="12" />
+			<column name="description" type="varchar" length="255" decimal="0" jt="12" />
+			<column name="comments" type="varchar" length="255" decimal="0" jt="12" />
+			<column name="tag" type="varchar" length="255" decimal="0" jt="12" />
+			<column name="liquibase" type="varchar" length="20" decimal="0" jt="12" />
+			<column name="contexts" type="varchar" length="255" decimal="0" jt="12" />
+			<column name="labels" type="varchar" length="255" decimal="0" jt="12" />
+			<column name="deployment_id" type="varchar" length="10" decimal="0" jt="12" />
+			<index name="idx_databasechangelog_id_author_filename" unique="UNIQUE" >
+				<column name="id" />
+				<column name="author" />
+				<column name="filename" />
+			</index>
+		</table>
+		<table name="databasechangeloglock" >
+			<column name="id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="locked" type="bool" length="1" decimal="0" jt="-7" mandatory="y" />
+			<column name="lockgranted" type="timestamp" length="29" decimal="6" jt="93" />
+			<column name="lockedby" type="varchar" length="255" decimal="0" jt="12" />
+			<index name="databasechangeloglock_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+		</table>
+		<table name="dependency" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="model" type="varchar" length="32" decimal="0" jt="12" mandatory="y" />
+			<column name="model_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="dependent_on_model" type="varchar" length="32" decimal="0" jt="12" mandatory="y" />
+			<column name="dependent_on_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="created_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<index name="dependency_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_dependency_dependent_on_id" unique="NORMAL" >
+				<column name="dependent_on_id" />
+			</index>
+			<index name="idx_dependency_dependent_on_model" unique="NORMAL" >
+				<column name="dependent_on_model" />
+			</index>
+			<index name="idx_dependency_model" unique="NORMAL" >
+				<column name="model" />
+			</index>
+			<index name="idx_dependency_model_id" unique="NORMAL" >
+				<column name="model_id" />
+			</index>
+		</table>
+		<table name="dimension" >
+			<comment><![CDATA[Stores references to alternate views of existing fields, such as remapping an integer to a description, like an enum]]></comment>
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="field_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" >
+				<comment><![CDATA[ID of the field this dimension row applies to]]></comment>
+			</column>
+			<column name="name" type="varchar" length="254" decimal="0" jt="12" mandatory="y" >
+				<comment><![CDATA[Short description used as the display name of this new column]]></comment>
+			</column>
+			<column name="type" type="varchar" length="254" decimal="0" jt="12" mandatory="y" >
+				<comment><![CDATA[Either internal for a user defined remapping or external for a foreign key based remapping]]></comment>
+			</column>
+			<column name="human_readable_field_id" type="integer" length="10" decimal="0" jt="4" >
+				<comment><![CDATA[Only used with external type remappings. Indicates which field on the FK related table to use for display]]></comment>
+			</column>
+			<column name="created_at" type="timestamp" length="29" decimal="6" jt="93" mandatory="y" >
+				<comment><![CDATA[The timestamp of when the dimension was created.]]></comment>
+			</column>
+			<column name="updated_at" type="timestamp" length="29" decimal="6" jt="93" mandatory="y" >
+				<comment><![CDATA[The timestamp of when these dimension was last updated.]]></comment>
+			</column>
+			<index name="dimension_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="unique_dimension_field_id_name" unique="UNIQUE" >
+				<column name="field_id" />
+				<column name="name" />
+			</index>
+			<index name="idx_dimension_field_id" unique="NORMAL" >
+				<column name="field_id" />
+			</index>
+			<fk name="fk_dimension_displayfk_ref_field_id" to_schema="public" to_table="metabase_field" delete_action="cascade" >
+				<fk_column name="human_readable_field_id" pk="id" />
+			</fk>
+			<fk name="fk_dimension_ref_field_id" to_schema="public" to_table="metabase_field" delete_action="cascade" >
+				<fk_column name="field_id" pk="id" />
+			</fk>
+		</table>
+		<table name="label" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="name" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="slug" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="icon" type="varchar" length="128" decimal="0" jt="12" />
+			<index name="label_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_label_slug" unique="NORMAL" >
+				<column name="slug" />
+			</index>
+		</table>
+		<table name="metabase_database" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="created_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="updated_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="name" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="description" type="text" decimal="0" jt="12" />
+			<column name="details" type="text" decimal="0" jt="12" />
+			<column name="engine" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="is_sample" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+			</column>
+			<column name="is_full_sync" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>true</defo>
+			</column>
+			<column name="points_of_interest" type="text" decimal="0" jt="12" />
+			<column name="caveats" type="text" decimal="0" jt="12" />
+			<column name="metadata_sync_schedule" type="varchar" length="254" decimal="0" jt="12" mandatory="y" >
+				<defo>&#039;0 50 * * * ? *&#039;::character varying</defo>
+				<comment><![CDATA[The cron schedule string for when this database should undergo the metadata sync process (and analysis for new fields).]]></comment>
+			</column>
+			<column name="cache_field_values_schedule" type="varchar" length="254" decimal="0" jt="12" mandatory="y" >
+				<defo>&#039;0 50 0 * * ? *&#039;::character varying</defo>
+				<comment><![CDATA[The cron schedule string for when FieldValues for eligible Fields should be updated.]]></comment>
+			</column>
+			<column name="timezone" type="varchar" length="254" decimal="0" jt="12" >
+				<comment><![CDATA[Timezone identifier for the database, set by the sync process]]></comment>
+			</column>
+			<column name="is_on_demand" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+				<comment><![CDATA[Whether we should do On-Demand caching of FieldValues for this DB. This means FieldValues are updated when their Field is used in a Dashboard or Card param.]]></comment>
+			</column>
+			<column name="options" type="text" decimal="0" jt="12" >
+				<comment><![CDATA[Serialized JSON containing various options like QB behavior.]]></comment>
+			</column>
+			<column name="auto_run_queries" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>true</defo>
+				<comment><![CDATA[Whether to automatically run queries when doing simple filtering and summarizing in the Query Builder.]]></comment>
+			</column>
+			<index name="metabase_database_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+		</table>
+		<table name="metabase_field" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="created_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="updated_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="name" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="base_type" type="varchar" length="255" decimal="0" jt="12" mandatory="y" />
+			<column name="special_type" type="varchar" length="255" decimal="0" jt="12" />
+			<column name="active" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>true</defo>
+			</column>
+			<column name="description" type="text" decimal="0" jt="12" />
+			<column name="preview_display" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>true</defo>
+			</column>
+			<column name="position" type="integer" length="10" decimal="0" jt="4" mandatory="y" >
+				<defo>0</defo>
+			</column>
+			<column name="table_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="parent_id" type="integer" length="10" decimal="0" jt="4" />
+			<column name="display_name" type="varchar" length="254" decimal="0" jt="12" />
+			<column name="visibility_type" type="varchar" length="32" decimal="0" jt="12" mandatory="y" >
+				<defo>&#039;normal&#039;::character varying</defo>
+			</column>
+			<column name="fk_target_field_id" type="integer" length="10" decimal="0" jt="4" />
+			<column name="last_analyzed" type="timestamptz" length="35" decimal="6" jt="93" />
+			<column name="points_of_interest" type="text" decimal="0" jt="12" />
+			<column name="caveats" type="text" decimal="0" jt="12" />
+			<column name="fingerprint" type="text" decimal="0" jt="12" >
+				<comment><![CDATA[Serialized JSON containing non-identifying information about this Field, such as min, max, and percent JSON. Used for classification.]]></comment>
+			</column>
+			<column name="fingerprint_version" type="integer" length="10" decimal="0" jt="4" mandatory="y" >
+				<defo>0</defo>
+				<comment><![CDATA[The version of the fingerprint for this Field. Used so we can keep track of which Fields need to be analyzed again when new things are added to fingerprints.]]></comment>
+			</column>
+			<column name="database_type" type="varchar" length="255" decimal="0" jt="12" mandatory="y" >
+				<comment><![CDATA[The actual type of this column in the database. e.g. VARCHAR or TEXT.]]></comment>
+			</column>
+			<column name="has_field_values" type="text" decimal="0" jt="12" >
+				<comment><![CDATA[Whether we have FieldValues ("list"), should ad-hoc search ("search"), disable entirely ("none"), or infer dynamically (null)"]]></comment>
+			</column>
+			<column name="settings" type="text" decimal="0" jt="12" >
+				<comment><![CDATA[Serialized JSON FE-specific settings like formatting, etc. Scope of what is stored here may increase in future.]]></comment>
+			</column>
+			<index name="metabase_field_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_uniq_field_table_id_parent_id_name" unique="UNIQUE" >
+				<column name="table_id" />
+				<column name="parent_id" />
+				<column name="name" />
+			</index>
+			<index name="idx_uniq_field_table_id_parent_id_name_2col" unique="UNIQUE" >
+				<column name="table_id" />
+				<column name="name" />
+			</index>
+			<index name="idx_field_parent_id" unique="NORMAL" >
+				<column name="parent_id" />
+			</index>
+			<index name="idx_field_table_id" unique="NORMAL" >
+				<column name="table_id" />
+			</index>
+			<fk name="fk_field_parent_ref_field_id" to_schema="public" to_table="metabase_field" >
+				<fk_column name="parent_id" pk="id" />
+			</fk>
+			<fk name="fk_field_ref_table_id" to_schema="public" to_table="metabase_table" >
+				<fk_column name="table_id" pk="id" />
+			</fk>
+		</table>
+		<table name="metabase_fieldvalues" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="created_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="updated_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="values" type="text" decimal="0" jt="12" />
+			<column name="human_readable_values" type="text" decimal="0" jt="12" />
+			<column name="field_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<index name="metabase_fieldvalues_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_fieldvalues_field_id" unique="NORMAL" >
+				<column name="field_id" />
+			</index>
+			<fk name="fk_fieldvalues_ref_field_id" to_schema="public" to_table="metabase_field" >
+				<fk_column name="field_id" pk="id" />
+			</fk>
+		</table>
+		<table name="metabase_table" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="created_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="updated_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="name" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="rows" type="bigint" length="19" decimal="0" jt="-5" />
+			<column name="description" type="text" decimal="0" jt="12" />
+			<column name="entity_name" type="varchar" length="254" decimal="0" jt="12" />
+			<column name="entity_type" type="varchar" length="254" decimal="0" jt="12" />
+			<column name="active" type="bool" length="1" decimal="0" jt="-7" mandatory="y" />
+			<column name="db_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="display_name" type="varchar" length="254" decimal="0" jt="12" />
+			<column name="visibility_type" type="varchar" length="254" decimal="0" jt="12" />
+			<column name="schema" type="varchar" length="254" decimal="0" jt="12" />
+			<column name="points_of_interest" type="text" decimal="0" jt="12" />
+			<column name="caveats" type="text" decimal="0" jt="12" />
+			<column name="show_in_getting_started" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+			</column>
+			<column name="fields_hash" type="text" decimal="0" jt="12" >
+				<comment><![CDATA[Computed hash of all of the fields associated to this table]]></comment>
+			</column>
+			<index name="metabase_table_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_uniq_table_db_id_schema_name" unique="UNIQUE" >
+				<column name="db_id" />
+				<column name="schema" />
+				<column name="name" />
+			</index>
+			<index name="idx_uniq_table_db_id_schema_name_2col" unique="UNIQUE" >
+				<column name="db_id" />
+				<column name="name" />
+			</index>
+			<index name="idx_metabase_table_db_id_schema" unique="NORMAL" >
+				<column name="db_id" />
+				<column name="schema" />
+			</index>
+			<index name="idx_metabase_table_show_in_getting_started" unique="NORMAL" >
+				<column name="show_in_getting_started" />
+			</index>
+			<index name="idx_table_db_id" unique="NORMAL" >
+				<column name="db_id" />
+			</index>
+			<fk name="fk_table_ref_database_id" to_schema="public" to_table="metabase_database" >
+				<fk_column name="db_id" pk="id" />
+			</fk>
+		</table>
+		<table name="metric" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="table_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="creator_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="name" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="description" type="text" decimal="0" jt="12" />
+			<column name="archived" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+			</column>
+			<column name="definition" type="text" decimal="0" jt="12" mandatory="y" />
+			<column name="created_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="updated_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="points_of_interest" type="text" decimal="0" jt="12" />
+			<column name="caveats" type="text" decimal="0" jt="12" />
+			<column name="how_is_this_calculated" type="text" decimal="0" jt="12" />
+			<column name="show_in_getting_started" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+			</column>
+			<index name="metric_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_metric_creator_id" unique="NORMAL" >
+				<column name="creator_id" />
+			</index>
+			<index name="idx_metric_show_in_getting_started" unique="NORMAL" >
+				<column name="show_in_getting_started" />
+			</index>
+			<index name="idx_metric_table_id" unique="NORMAL" >
+				<column name="table_id" />
+			</index>
+			<fk name="fk_metric_ref_creator_id" to_schema="public" to_table="core_user" >
+				<fk_column name="creator_id" pk="id" />
+			</fk>
+			<fk name="fk_metric_ref_table_id" to_schema="public" to_table="metabase_table" >
+				<fk_column name="table_id" pk="id" />
+			</fk>
+		</table>
+		<table name="metric_important_field" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="metric_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="field_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<index name="metric_important_field_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="unique_metric_important_field_metric_id_field_id" unique="UNIQUE" >
+				<column name="metric_id" />
+				<column name="field_id" />
+			</index>
+			<index name="idx_metric_important_field_field_id" unique="NORMAL" >
+				<column name="field_id" />
+			</index>
+			<index name="idx_metric_important_field_metric_id" unique="NORMAL" >
+				<column name="metric_id" />
+			</index>
+			<fk name="fk_metric_important_field_metabase_field_id" to_schema="public" to_table="metabase_field" >
+				<fk_column name="field_id" pk="id" />
+			</fk>
+			<fk name="fk_metric_important_field_metric_id" to_schema="public" to_table="metric" >
+				<fk_column name="metric_id" pk="id" />
+			</fk>
+		</table>
+		<table name="permissions" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="object" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="group_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<index name="permissions_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_permissions_group_id" unique="NORMAL" >
+				<column name="group_id" />
+			</index>
+			<index name="idx_permissions_group_id_object" unique="NORMAL" >
+				<column name="group_id" />
+				<column name="object" />
+			</index>
+			<index name="idx_permissions_object" unique="NORMAL" >
+				<column name="object" />
+			</index>
+			<fk name="fk_permissions_group_id" to_schema="public" to_table="permissions_group" >
+				<fk_column name="group_id" pk="id" />
+			</fk>
+		</table>
+		<table name="permissions_group" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="name" type="varchar" length="255" decimal="0" jt="12" mandatory="y" />
+			<index name="permissions_group_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_permissions_group_name" unique="NORMAL" >
+				<column name="name" />
+			</index>
+		</table>
+		<table name="permissions_group_membership" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="user_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="group_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<index name="permissions_group_membership_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="unique_permissions_group_membership_user_id_group_id" unique="UNIQUE" >
+				<column name="user_id" />
+				<column name="group_id" />
+			</index>
+			<index name="idx_permissions_group_membership_group_id" unique="NORMAL" >
+				<column name="group_id" />
+			</index>
+			<index name="idx_permissions_group_membership_group_id_user_id" unique="NORMAL" >
+				<column name="group_id" />
+				<column name="user_id" />
+			</index>
+			<index name="idx_permissions_group_membership_user_id" unique="NORMAL" >
+				<column name="user_id" />
+			</index>
+			<fk name="fk_permissions_group_membership_user_id" to_schema="public" to_table="core_user" >
+				<fk_column name="user_id" pk="id" />
+			</fk>
+			<fk name="fk_permissions_group_group_id" to_schema="public" to_table="permissions_group" >
+				<fk_column name="group_id" pk="id" />
+			</fk>
+		</table>
+		<table name="permissions_revision" >
+			<comment><![CDATA[Used to keep track of changes made to permissions.]]></comment>
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="before" type="text" decimal="0" jt="12" mandatory="y" >
+				<comment><![CDATA[Serialized JSON of the permissions before the changes.]]></comment>
+			</column>
+			<column name="after" type="text" decimal="0" jt="12" mandatory="y" >
+				<comment><![CDATA[Serialized JSON of the permissions after the changes.]]></comment>
+			</column>
+			<column name="user_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" >
+				<comment><![CDATA[The ID of the admin who made this set of changes.]]></comment>
+			</column>
+			<column name="created_at" type="timestamp" length="29" decimal="6" jt="93" mandatory="y" >
+				<comment><![CDATA[The timestamp of when these changes were made.]]></comment>
+			</column>
+			<column name="remark" type="text" decimal="0" jt="12" >
+				<comment><![CDATA[Optional remarks explaining why these changes were made.]]></comment>
+			</column>
+			<index name="permissions_revision_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_permissions_revision_user_id" to_schema="public" to_table="core_user" >
+				<fk_column name="user_id" pk="id" />
+			</fk>
+		</table>
+		<table name="pulse" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="creator_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="name" type="varchar" length="254" decimal="0" jt="12" />
+			<column name="created_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="updated_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="skip_if_empty" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+				<comment><![CDATA[Skip a scheduled Pulse if none of its questions have any results]]></comment>
+			</column>
+			<column name="alert_condition" type="varchar" length="254" decimal="0" jt="12" >
+				<comment><![CDATA[Condition (i.e. "rows" or "goal") used as a guard for alerts]]></comment>
+			</column>
+			<column name="alert_first_only" type="bool" length="1" decimal="0" jt="-7" >
+				<comment><![CDATA[True if the alert should be disabled after the first notification]]></comment>
+			</column>
+			<column name="alert_above_goal" type="bool" length="1" decimal="0" jt="-7" >
+				<comment><![CDATA[For a goal condition, alert when above the goal]]></comment>
+			</column>
+			<column name="collection_id" type="integer" length="10" decimal="0" jt="4" >
+				<comment><![CDATA[Options ID of Collection this Pulse belongs to.]]></comment>
+			</column>
+			<column name="collection_position" type="smallint" length="5" decimal="0" jt="5" >
+				<comment><![CDATA[Optional pinned position for this item in its Collection. NULL means item is not pinned.]]></comment>
+			</column>
+			<column name="archived" type="bool" length="1" decimal="0" jt="-7" >
+				<defo>false</defo>
+				<comment><![CDATA[Has this pulse been archived?]]></comment>
+			</column>
+			<index name="pulse_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_pulse_collection_id" unique="NORMAL" >
+				<column name="collection_id" />
+			</index>
+			<index name="idx_pulse_creator_id" unique="NORMAL" >
+				<column name="creator_id" />
+			</index>
+			<fk name="fk_pulse_collection_id" to_schema="public" to_table="collection" >
+				<fk_column name="collection_id" pk="id" />
+			</fk>
+			<fk name="fk_pulse_ref_creator_id" to_schema="public" to_table="core_user" >
+				<fk_column name="creator_id" pk="id" />
+			</fk>
+		</table>
+		<table name="pulse_card" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="pulse_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="card_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="position" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="include_csv" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+				<comment><![CDATA[True if a CSV of the data should be included for this pulse card]]></comment>
+			</column>
+			<column name="include_xls" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+				<comment><![CDATA[True if a XLS of the data should be included for this pulse card]]></comment>
+			</column>
+			<index name="pulse_card_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_pulse_card_card_id" unique="NORMAL" >
+				<column name="card_id" />
+			</index>
+			<index name="idx_pulse_card_pulse_id" unique="NORMAL" >
+				<column name="pulse_id" />
+			</index>
+			<fk name="fk_pulse_card_ref_pulse_id" to_schema="public" to_table="pulse" >
+				<fk_column name="pulse_id" pk="id" />
+			</fk>
+			<fk name="fk_pulse_card_ref_card_id" to_schema="public" to_table="report_card" >
+				<fk_column name="card_id" pk="id" />
+			</fk>
+		</table>
+		<table name="pulse_channel" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="pulse_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="channel_type" type="varchar" length="32" decimal="0" jt="12" mandatory="y" />
+			<column name="details" type="text" decimal="0" jt="12" mandatory="y" />
+			<column name="schedule_type" type="varchar" length="32" decimal="0" jt="12" mandatory="y" />
+			<column name="schedule_hour" type="integer" length="10" decimal="0" jt="4" />
+			<column name="schedule_day" type="varchar" length="64" decimal="0" jt="12" />
+			<column name="created_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="updated_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="schedule_frame" type="varchar" length="32" decimal="0" jt="12" />
+			<column name="enabled" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>true</defo>
+			</column>
+			<index name="pulse_channel_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_pulse_channel_pulse_id" unique="NORMAL" >
+				<column name="pulse_id" />
+			</index>
+			<index name="idx_pulse_channel_schedule_type" unique="NORMAL" >
+				<column name="schedule_type" />
+			</index>
+			<fk name="fk_pulse_channel_ref_pulse_id" to_schema="public" to_table="pulse" >
+				<fk_column name="pulse_id" pk="id" />
+			</fk>
+		</table>
+		<table name="pulse_channel_recipient" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="pulse_channel_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="user_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<index name="pulse_channel_recipient_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_pulse_channel_recipient_ref_user_id" to_schema="public" to_table="core_user" >
+				<fk_column name="user_id" pk="id" />
+			</fk>
+			<fk name="fk_pulse_channel_recipient_ref_pulse_channel_id" to_schema="public" to_table="pulse_channel" >
+				<fk_column name="pulse_channel_id" pk="id" />
+			</fk>
+		</table>
+		<table name="qrtz_blob_triggers" >
+			<comment><![CDATA[Used for Quartz scheduler.]]></comment>
+			<column name="sched_name" type="varchar" length="120" decimal="0" jt="12" mandatory="y" />
+			<column name="trigger_name" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<column name="trigger_group" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<column name="blob_data" type="bytea" decimal="0" jt="-2" />
+			<index name="pk_qrtz_blob_triggers" unique="PRIMARY_KEY" >
+				<column name="sched_name" />
+				<column name="trigger_name" />
+				<column name="trigger_group" />
+			</index>
+			<fk name="fk_qrtz_blob_triggers_triggers" to_schema="public" to_table="qrtz_triggers" >
+				<fk_column name="sched_name" pk="sched_name" />
+				<fk_column name="trigger_name" pk="trigger_name" />
+				<fk_column name="trigger_group" pk="trigger_group" />
+			</fk>
+		</table>
+		<table name="qrtz_calendars" >
+			<comment><![CDATA[Used for Quartz scheduler.]]></comment>
+			<column name="sched_name" type="varchar" length="120" decimal="0" jt="12" mandatory="y" />
+			<column name="calendar_name" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<column name="calendar" type="bytea" decimal="0" jt="-2" mandatory="y" />
+			<index name="pk_qrtz_calendars" unique="PRIMARY_KEY" >
+				<column name="sched_name" />
+				<column name="calendar_name" />
+			</index>
+		</table>
+		<table name="qrtz_cron_triggers" >
+			<comment><![CDATA[Used for Quartz scheduler.]]></comment>
+			<column name="sched_name" type="varchar" length="120" decimal="0" jt="12" mandatory="y" />
+			<column name="trigger_name" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<column name="trigger_group" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<column name="cron_expression" type="varchar" length="120" decimal="0" jt="12" mandatory="y" />
+			<column name="time_zone_id" type="varchar" length="80" decimal="0" jt="12" />
+			<index name="pk_qrtz_cron_triggers" unique="PRIMARY_KEY" >
+				<column name="sched_name" />
+				<column name="trigger_name" />
+				<column name="trigger_group" />
+			</index>
+			<fk name="fk_qrtz_cron_triggers_triggers" to_schema="public" to_table="qrtz_triggers" >
+				<fk_column name="sched_name" pk="sched_name" />
+				<fk_column name="trigger_name" pk="trigger_name" />
+				<fk_column name="trigger_group" pk="trigger_group" />
+			</fk>
+		</table>
+		<table name="qrtz_fired_triggers" >
+			<comment><![CDATA[Used for Quartz scheduler.]]></comment>
+			<column name="sched_name" type="varchar" length="120" decimal="0" jt="12" mandatory="y" />
+			<column name="entry_id" type="varchar" length="95" decimal="0" jt="12" mandatory="y" />
+			<column name="trigger_name" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<column name="trigger_group" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<column name="instance_name" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<column name="fired_time" type="bigint" length="19" decimal="0" jt="-5" mandatory="y" />
+			<column name="sched_time" type="bigint" length="19" decimal="0" jt="-5" />
+			<column name="priority" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="state" type="varchar" length="16" decimal="0" jt="12" mandatory="y" />
+			<column name="job_name" type="varchar" length="200" decimal="0" jt="12" />
+			<column name="job_group" type="varchar" length="200" decimal="0" jt="12" />
+			<column name="is_nonconcurrent" type="bool" length="1" decimal="0" jt="-7" />
+			<column name="requests_recovery" type="bool" length="1" decimal="0" jt="-7" />
+			<index name="pk_qrtz_fired_triggers" unique="PRIMARY_KEY" >
+				<column name="sched_name" />
+				<column name="entry_id" />
+			</index>
+			<index name="idx_qrtz_ft_inst_job_req_rcvry" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="instance_name" />
+				<column name="requests_recovery" />
+			</index>
+			<index name="idx_qrtz_ft_j_g" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="job_name" />
+				<column name="job_group" />
+			</index>
+			<index name="idx_qrtz_ft_jg" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="job_group" />
+			</index>
+			<index name="idx_qrtz_ft_t_g" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="trigger_name" />
+				<column name="trigger_group" />
+			</index>
+			<index name="idx_qrtz_ft_tg" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="trigger_group" />
+			</index>
+			<index name="idx_qrtz_ft_trig_inst_name" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="instance_name" />
+			</index>
+		</table>
+		<table name="qrtz_job_details" >
+			<comment><![CDATA[Used for Quartz scheduler.]]></comment>
+			<column name="sched_name" type="varchar" length="120" decimal="0" jt="12" mandatory="y" />
+			<column name="job_name" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<column name="job_group" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<column name="description" type="varchar" length="250" decimal="0" jt="12" />
+			<column name="job_class_name" type="varchar" length="250" decimal="0" jt="12" mandatory="y" />
+			<column name="is_durable" type="bool" length="1" decimal="0" jt="-7" mandatory="y" />
+			<column name="is_nonconcurrent" type="bool" length="1" decimal="0" jt="-7" mandatory="y" />
+			<column name="is_update_data" type="bool" length="1" decimal="0" jt="-7" mandatory="y" />
+			<column name="requests_recovery" type="bool" length="1" decimal="0" jt="-7" mandatory="y" />
+			<column name="job_data" type="bytea" decimal="0" jt="-2" />
+			<index name="pk_qrtz_job_details" unique="PRIMARY_KEY" >
+				<column name="sched_name" />
+				<column name="job_name" />
+				<column name="job_group" />
+			</index>
+			<index name="idx_qrtz_j_grp" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="job_group" />
+			</index>
+			<index name="idx_qrtz_j_req_recovery" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="requests_recovery" />
+			</index>
+		</table>
+		<table name="qrtz_locks" >
+			<comment><![CDATA[Used for Quartz scheduler.]]></comment>
+			<column name="sched_name" type="varchar" length="120" decimal="0" jt="12" mandatory="y" />
+			<column name="lock_name" type="varchar" length="40" decimal="0" jt="12" mandatory="y" />
+			<index name="pk_qrtz_locks" unique="PRIMARY_KEY" >
+				<column name="sched_name" />
+				<column name="lock_name" />
+			</index>
+		</table>
+		<table name="qrtz_paused_trigger_grps" >
+			<comment><![CDATA[Used for Quartz scheduler.]]></comment>
+			<column name="sched_name" type="varchar" length="120" decimal="0" jt="12" mandatory="y" />
+			<column name="trigger_group" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<index name="pk_sched_name" unique="PRIMARY_KEY" >
+				<column name="sched_name" />
+				<column name="trigger_group" />
+			</index>
+		</table>
+		<table name="qrtz_scheduler_state" >
+			<comment><![CDATA[Used for Quartz scheduler.]]></comment>
+			<column name="sched_name" type="varchar" length="120" decimal="0" jt="12" mandatory="y" />
+			<column name="instance_name" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<column name="last_checkin_time" type="bigint" length="19" decimal="0" jt="-5" mandatory="y" />
+			<column name="checkin_interval" type="bigint" length="19" decimal="0" jt="-5" mandatory="y" />
+			<index name="pk_qrtz_scheduler_state" unique="PRIMARY_KEY" >
+				<column name="sched_name" />
+				<column name="instance_name" />
+			</index>
+		</table>
+		<table name="qrtz_simple_triggers" >
+			<comment><![CDATA[Used for Quartz scheduler.]]></comment>
+			<column name="sched_name" type="varchar" length="120" decimal="0" jt="12" mandatory="y" />
+			<column name="trigger_name" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<column name="trigger_group" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<column name="repeat_count" type="bigint" length="19" decimal="0" jt="-5" mandatory="y" />
+			<column name="repeat_interval" type="bigint" length="19" decimal="0" jt="-5" mandatory="y" />
+			<column name="times_triggered" type="bigint" length="19" decimal="0" jt="-5" mandatory="y" />
+			<index name="pk_qrtz_simple_triggers" unique="PRIMARY_KEY" >
+				<column name="sched_name" />
+				<column name="trigger_name" />
+				<column name="trigger_group" />
+			</index>
+			<fk name="fk_qrtz_simple_triggers_triggers" to_schema="public" to_table="qrtz_triggers" >
+				<fk_column name="sched_name" pk="sched_name" />
+				<fk_column name="trigger_name" pk="trigger_name" />
+				<fk_column name="trigger_group" pk="trigger_group" />
+			</fk>
+		</table>
+		<table name="qrtz_simprop_triggers" >
+			<comment><![CDATA[Used for Quartz scheduler.]]></comment>
+			<column name="sched_name" type="varchar" length="120" decimal="0" jt="12" mandatory="y" />
+			<column name="trigger_name" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<column name="trigger_group" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<column name="str_prop_1" type="varchar" length="512" decimal="0" jt="12" />
+			<column name="str_prop_2" type="varchar" length="512" decimal="0" jt="12" />
+			<column name="str_prop_3" type="varchar" length="512" decimal="0" jt="12" />
+			<column name="int_prop_1" type="integer" length="10" decimal="0" jt="4" />
+			<column name="int_prop_2" type="integer" length="10" decimal="0" jt="4" />
+			<column name="long_prop_1" type="bigint" length="19" decimal="0" jt="-5" />
+			<column name="long_prop_2" type="bigint" length="19" decimal="0" jt="-5" />
+			<column name="dec_prop_1" type="numeric" length="13" decimal="4" jt="2" />
+			<column name="dec_prop_2" type="numeric" length="13" decimal="4" jt="2" />
+			<column name="bool_prop_1" type="bool" length="1" decimal="0" jt="-7" />
+			<column name="bool_prop_2" type="bool" length="1" decimal="0" jt="-7" />
+			<index name="pk_qrtz_simprop_triggers" unique="PRIMARY_KEY" >
+				<column name="sched_name" />
+				<column name="trigger_name" />
+				<column name="trigger_group" />
+			</index>
+			<fk name="fk_qrtz_simprop_triggers_triggers" to_schema="public" to_table="qrtz_triggers" >
+				<fk_column name="sched_name" pk="sched_name" />
+				<fk_column name="trigger_name" pk="trigger_name" />
+				<fk_column name="trigger_group" pk="trigger_group" />
+			</fk>
+		</table>
+		<table name="qrtz_triggers" >
+			<comment><![CDATA[Used for Quartz scheduler.]]></comment>
+			<column name="sched_name" type="varchar" length="120" decimal="0" jt="12" mandatory="y" />
+			<column name="trigger_name" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<column name="trigger_group" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<column name="job_name" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<column name="job_group" type="varchar" length="200" decimal="0" jt="12" mandatory="y" />
+			<column name="description" type="varchar" length="250" decimal="0" jt="12" />
+			<column name="next_fire_time" type="bigint" length="19" decimal="0" jt="-5" />
+			<column name="prev_fire_time" type="bigint" length="19" decimal="0" jt="-5" />
+			<column name="priority" type="integer" length="10" decimal="0" jt="4" />
+			<column name="trigger_state" type="varchar" length="16" decimal="0" jt="12" mandatory="y" />
+			<column name="trigger_type" type="varchar" length="8" decimal="0" jt="12" mandatory="y" />
+			<column name="start_time" type="bigint" length="19" decimal="0" jt="-5" mandatory="y" />
+			<column name="end_time" type="bigint" length="19" decimal="0" jt="-5" />
+			<column name="calendar_name" type="varchar" length="200" decimal="0" jt="12" />
+			<column name="misfire_instr" type="smallint" length="5" decimal="0" jt="5" />
+			<column name="job_data" type="bytea" decimal="0" jt="-2" />
+			<index name="pk_qrtz_triggers" unique="PRIMARY_KEY" >
+				<column name="sched_name" />
+				<column name="trigger_name" />
+				<column name="trigger_group" />
+			</index>
+			<index name="idx_qrtz_t_c" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="calendar_name" />
+			</index>
+			<index name="idx_qrtz_t_g" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="trigger_group" />
+			</index>
+			<index name="idx_qrtz_t_j" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="job_name" />
+				<column name="job_group" />
+			</index>
+			<index name="idx_qrtz_t_jg" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="job_group" />
+			</index>
+			<index name="idx_qrtz_t_n_g_state" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="trigger_group" />
+				<column name="trigger_state" />
+			</index>
+			<index name="idx_qrtz_t_n_state" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="trigger_name" />
+				<column name="trigger_group" />
+				<column name="trigger_state" />
+			</index>
+			<index name="idx_qrtz_t_next_fire_time" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="next_fire_time" />
+			</index>
+			<index name="idx_qrtz_t_nft_misfire" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="misfire_instr" />
+				<column name="next_fire_time" />
+			</index>
+			<index name="idx_qrtz_t_nft_st" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="trigger_state" />
+				<column name="next_fire_time" />
+			</index>
+			<index name="idx_qrtz_t_nft_st_misfire" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="misfire_instr" />
+				<column name="next_fire_time" />
+				<column name="trigger_state" />
+			</index>
+			<index name="idx_qrtz_t_nft_st_misfire_grp" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="misfire_instr" />
+				<column name="next_fire_time" />
+				<column name="trigger_group" />
+				<column name="trigger_state" />
+			</index>
+			<index name="idx_qrtz_t_state" unique="NORMAL" >
+				<column name="sched_name" />
+				<column name="trigger_state" />
+			</index>
+			<fk name="fk_qrtz_triggers_job_details" to_schema="public" to_table="qrtz_job_details" >
+				<fk_column name="sched_name" pk="sched_name" />
+				<fk_column name="job_name" pk="job_name" />
+				<fk_column name="job_group" pk="job_group" />
+			</fk>
+		</table>
+		<table name="query" >
+			<comment><![CDATA[Information (such as average execution time) for different queries that have been previously ran.]]></comment>
+			<column name="query_hash" type="bytea" decimal="0" jt="-2" mandatory="y" >
+				<comment><![CDATA[The hash of the query dictionary. (This is a 256-bit SHA3 hash of the query dict.)]]></comment>
+			</column>
+			<column name="average_execution_time" type="integer" length="10" decimal="0" jt="4" mandatory="y" >
+				<comment><![CDATA[Average execution time for the query, round to nearest number of milliseconds. This is updated as a rolling average.]]></comment>
+			</column>
+			<column name="query" type="text" decimal="0" jt="12" >
+				<comment><![CDATA[The actual "query dictionary" for this query.]]></comment>
+			</column>
+			<index name="query_pkey" unique="PRIMARY_KEY" >
+				<column name="query_hash" />
+			</index>
+		</table>
+		<table name="query_cache" >
+			<comment><![CDATA[Cached results of queries are stored here when using the DB-based query cache.]]></comment>
+			<column name="query_hash" type="bytea" decimal="0" jt="-2" mandatory="y" >
+				<comment><![CDATA[The hash of the query dictionary. (This is a 256-bit SHA3 hash of the query dict).]]></comment>
+			</column>
+			<column name="updated_at" type="timestamp" length="29" decimal="6" jt="93" mandatory="y" >
+				<comment><![CDATA[The timestamp of when these query results were last refreshed.]]></comment>
+			</column>
+			<column name="results" type="bytea" decimal="0" jt="-2" mandatory="y" >
+				<comment><![CDATA[Cached, compressed results of running the query with the given hash.]]></comment>
+			</column>
+			<index name="query_cache_pkey" unique="PRIMARY_KEY" >
+				<column name="query_hash" />
+			</index>
+			<index name="idx_query_cache_updated_at" unique="NORMAL" >
+				<column name="updated_at" />
+			</index>
+		</table>
+		<table name="query_execution" >
+			<comment><![CDATA[A log of executed queries, used for calculating historic execution times, auditing, and other purposes.]]></comment>
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="hash" type="bytea" decimal="0" jt="-2" mandatory="y" >
+				<comment><![CDATA[The hash of the query dictionary. This is a 256-bit SHA3 hash of the query.]]></comment>
+			</column>
+			<column name="started_at" type="timestamp" length="29" decimal="6" jt="93" mandatory="y" >
+				<comment><![CDATA[Timestamp of when this query started running.]]></comment>
+			</column>
+			<column name="running_time" type="integer" length="10" decimal="0" jt="4" mandatory="y" >
+				<comment><![CDATA[The time, in milliseconds, this query took to complete.]]></comment>
+			</column>
+			<column name="result_rows" type="integer" length="10" decimal="0" jt="4" mandatory="y" >
+				<comment><![CDATA[Number of rows in the query results.]]></comment>
+			</column>
+			<column name="native" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<comment><![CDATA[Whether the query was a native query, as opposed to an MBQL one (e.g., created with the GUI).]]></comment>
+			</column>
+			<column name="context" type="varchar" length="32" decimal="0" jt="12" >
+				<comment><![CDATA[Short string specifying how this query was executed, e.g. in a Dashboard or Pulse.]]></comment>
+			</column>
+			<column name="error" type="text" decimal="0" jt="12" >
+				<comment><![CDATA[Error message returned by failed query, if any.]]></comment>
+			</column>
+			<column name="executor_id" type="integer" length="10" decimal="0" jt="4" >
+				<comment><![CDATA[The ID of the User who triggered this query execution, if any.]]></comment>
+			</column>
+			<column name="card_id" type="integer" length="10" decimal="0" jt="4" >
+				<comment><![CDATA[The ID of the Card (Question) associated with this query execution, if any.]]></comment>
+			</column>
+			<column name="dashboard_id" type="integer" length="10" decimal="0" jt="4" >
+				<comment><![CDATA[The ID of the Dashboard associated with this query execution, if any.]]></comment>
+			</column>
+			<column name="pulse_id" type="integer" length="10" decimal="0" jt="4" >
+				<comment><![CDATA[The ID of the Pulse associated with this query execution, if any.]]></comment>
+			</column>
+			<column name="database_id" type="integer" length="10" decimal="0" jt="4" >
+				<comment><![CDATA[ID of the database this query was ran against.]]></comment>
+			</column>
+			<index name="query_execution_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_query_execution_query_hash_started_at" unique="NORMAL" >
+				<column name="hash" />
+				<column name="started_at" />
+			</index>
+			<index name="idx_query_execution_started_at" unique="NORMAL" >
+				<column name="started_at" />
+			</index>
+		</table>
+		<table name="report_card" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="created_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="updated_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="name" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="description" type="text" decimal="0" jt="12" />
+			<column name="display" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="dataset_query" type="text" decimal="0" jt="12" mandatory="y" />
+			<column name="visualization_settings" type="text" decimal="0" jt="12" mandatory="y" />
+			<column name="creator_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="database_id" type="integer" length="10" decimal="0" jt="4" />
+			<column name="table_id" type="integer" length="10" decimal="0" jt="4" />
+			<column name="query_type" type="varchar" length="16" decimal="0" jt="12" />
+			<column name="archived" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+			</column>
+			<column name="collection_id" type="integer" length="10" decimal="0" jt="4" >
+				<comment><![CDATA[Optional ID of Collection this Card belongs to.]]></comment>
+			</column>
+			<column name="public_uuid" type="char" length="36" decimal="0" jt="1" >
+				<comment><![CDATA[Unique UUID used to in publically-accessible links to this Card.]]></comment>
+			</column>
+			<column name="made_public_by_id" type="integer" length="10" decimal="0" jt="4" >
+				<comment><![CDATA[The ID of the User who first publically shared this Card.]]></comment>
+			</column>
+			<column name="enable_embedding" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+				<comment><![CDATA[Is this Card allowed to be embedded in different websites (using a signed JWT)?]]></comment>
+			</column>
+			<column name="embedding_params" type="text" decimal="0" jt="12" >
+				<comment><![CDATA[Serialized JSON containing information about required parameters that must be supplied when embedding this Card.]]></comment>
+			</column>
+			<column name="cache_ttl" type="integer" length="10" decimal="0" jt="4" >
+				<comment><![CDATA[The maximum time, in seconds, to return cached results for this Card rather than running a new query.]]></comment>
+			</column>
+			<column name="result_metadata" type="text" decimal="0" jt="12" >
+				<comment><![CDATA[Serialized JSON containing metadata about the result columns from running the query.]]></comment>
+			</column>
+			<column name="read_permissions" type="text" decimal="0" jt="12" >
+				<comment><![CDATA[Permissions required to view this Card and run its query.]]></comment>
+			</column>
+			<column name="collection_position" type="smallint" length="5" decimal="0" jt="5" >
+				<comment><![CDATA[Optional pinned position for this item in its Collection. NULL means item is not pinned.]]></comment>
+			</column>
+			<index name="report_card_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_card_collection_id" unique="NORMAL" >
+				<column name="collection_id" />
+			</index>
+			<index name="idx_card_creator_id" unique="NORMAL" >
+				<column name="creator_id" />
+			</index>
+			<index name="idx_card_public_uuid" unique="NORMAL" >
+				<column name="public_uuid" />
+			</index>
+			<fk name="fk_card_collection_id" to_schema="public" to_table="collection" >
+				<fk_column name="collection_id" pk="id" />
+			</fk>
+			<fk name="fk_card_made_public_by_id" to_schema="public" to_table="core_user" >
+				<fk_column name="made_public_by_id" pk="id" />
+			</fk>
+			<fk name="fk_card_ref_user_id" to_schema="public" to_table="core_user" >
+				<fk_column name="creator_id" pk="id" />
+			</fk>
+			<fk name="fk_report_card_ref_database_id" to_schema="public" to_table="metabase_database" >
+				<fk_column name="database_id" pk="id" />
+			</fk>
+			<fk name="fk_report_card_ref_table_id" to_schema="public" to_table="metabase_table" >
+				<fk_column name="table_id" pk="id" />
+			</fk>
+		</table>
+		<table name="report_cardfavorite" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="created_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="updated_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="card_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="owner_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<index name="report_cardfavorite_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_unique_cardfavorite_card_id_owner_id" unique="UNIQUE" >
+				<column name="card_id" />
+				<column name="owner_id" />
+			</index>
+			<index name="idx_cardfavorite_card_id" unique="NORMAL" >
+				<column name="card_id" />
+			</index>
+			<index name="idx_cardfavorite_owner_id" unique="NORMAL" >
+				<column name="owner_id" />
+			</index>
+			<fk name="fk_cardfavorite_ref_user_id" to_schema="public" to_table="core_user" >
+				<fk_column name="owner_id" pk="id" />
+			</fk>
+			<fk name="fk_cardfavorite_ref_card_id" to_schema="public" to_table="report_card" >
+				<fk_column name="card_id" pk="id" />
+			</fk>
+		</table>
+		<table name="report_dashboard" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="created_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="updated_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="name" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="description" type="text" decimal="0" jt="12" />
+			<column name="creator_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="parameters" type="text" decimal="0" jt="12" mandatory="y" />
+			<column name="points_of_interest" type="text" decimal="0" jt="12" />
+			<column name="caveats" type="text" decimal="0" jt="12" />
+			<column name="show_in_getting_started" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+			</column>
+			<column name="public_uuid" type="char" length="36" decimal="0" jt="1" >
+				<comment><![CDATA[Unique UUID used to in publically-accessible links to this Dashboard.]]></comment>
+			</column>
+			<column name="made_public_by_id" type="integer" length="10" decimal="0" jt="4" >
+				<comment><![CDATA[The ID of the User who first publically shared this Dashboard.]]></comment>
+			</column>
+			<column name="enable_embedding" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+				<comment><![CDATA[Is this Dashboard allowed to be embedded in different websites (using a signed JWT)?]]></comment>
+			</column>
+			<column name="embedding_params" type="text" decimal="0" jt="12" >
+				<comment><![CDATA[Serialized JSON containing information about required parameters that must be supplied when embedding this Dashboard.]]></comment>
+			</column>
+			<column name="archived" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+				<comment><![CDATA[Is this Dashboard archived (effectively treated as deleted?)]]></comment>
+			</column>
+			<column name="position" type="integer" length="10" decimal="0" jt="4" >
+				<comment><![CDATA[The position this Dashboard should appear in the Dashboards list, lower-numbered positions appearing before higher numbered ones.]]></comment>
+			</column>
+			<column name="collection_id" type="integer" length="10" decimal="0" jt="4" >
+				<comment><![CDATA[Optional ID of Collection this Dashboard belongs to.]]></comment>
+			</column>
+			<column name="collection_position" type="smallint" length="5" decimal="0" jt="5" >
+				<comment><![CDATA[Optional pinned position for this item in its Collection. NULL means item is not pinned.]]></comment>
+			</column>
+			<index name="report_dashboard_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_dashboard_collection_id" unique="NORMAL" >
+				<column name="collection_id" />
+			</index>
+			<index name="idx_dashboard_creator_id" unique="NORMAL" >
+				<column name="creator_id" />
+			</index>
+			<index name="idx_dashboard_public_uuid" unique="NORMAL" >
+				<column name="public_uuid" />
+			</index>
+			<index name="idx_report_dashboard_show_in_getting_started" unique="NORMAL" >
+				<column name="show_in_getting_started" />
+			</index>
+			<fk name="fk_dashboard_collection_id" to_schema="public" to_table="collection" >
+				<fk_column name="collection_id" pk="id" />
+			</fk>
+			<fk name="fk_dashboard_made_public_by_id" to_schema="public" to_table="core_user" >
+				<fk_column name="made_public_by_id" pk="id" />
+			</fk>
+			<fk name="fk_dashboard_ref_user_id" to_schema="public" to_table="core_user" >
+				<fk_column name="creator_id" pk="id" />
+			</fk>
+		</table>
+		<table name="report_dashboardcard" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="created_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="updated_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="sizeX" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="sizeY" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="row" type="integer" length="10" decimal="0" jt="4" mandatory="y" >
+				<defo>0</defo>
+			</column>
+			<column name="col" type="integer" length="10" decimal="0" jt="4" mandatory="y" >
+				<defo>0</defo>
+			</column>
+			<column name="card_id" type="integer" length="10" decimal="0" jt="4" />
+			<column name="dashboard_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="parameter_mappings" type="text" decimal="0" jt="12" mandatory="y" />
+			<column name="visualization_settings" type="text" decimal="0" jt="12" mandatory="y" />
+			<index name="report_dashboardcard_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_dashboardcard_card_id" unique="NORMAL" >
+				<column name="card_id" />
+			</index>
+			<index name="idx_dashboardcard_dashboard_id" unique="NORMAL" >
+				<column name="dashboard_id" />
+			</index>
+			<fk name="fk_dashboardcard_ref_card_id" to_schema="public" to_table="report_card" >
+				<fk_column name="card_id" pk="id" />
+			</fk>
+			<fk name="fk_dashboardcard_ref_dashboard_id" to_schema="public" to_table="report_dashboard" >
+				<fk_column name="dashboard_id" pk="id" />
+			</fk>
+		</table>
+		<table name="revision" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="model" type="varchar" length="16" decimal="0" jt="12" mandatory="y" />
+			<column name="model_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="user_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="timestamp" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="object" type="varchar" decimal="0" jt="12" mandatory="y" />
+			<column name="is_reversion" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+			</column>
+			<column name="is_creation" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+			</column>
+			<column name="message" type="text" decimal="0" jt="12" />
+			<index name="revision_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_revision_model_model_id" unique="NORMAL" >
+				<column name="model" />
+				<column name="model_id" />
+			</index>
+			<fk name="fk_revision_ref_user_id" to_schema="public" to_table="core_user" >
+				<fk_column name="user_id" pk="id" />
+			</fk>
+		</table>
+		<table name="segment" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="table_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="creator_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="name" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="description" type="text" decimal="0" jt="12" />
+			<column name="archived" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+			</column>
+			<column name="definition" type="text" decimal="0" jt="12" mandatory="y" />
+			<column name="created_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="updated_at" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<column name="points_of_interest" type="text" decimal="0" jt="12" />
+			<column name="caveats" type="text" decimal="0" jt="12" />
+			<column name="show_in_getting_started" type="bool" length="1" decimal="0" jt="-7" mandatory="y" >
+				<defo>false</defo>
+			</column>
+			<index name="segment_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_segment_creator_id" unique="NORMAL" >
+				<column name="creator_id" />
+			</index>
+			<index name="idx_segment_show_in_getting_started" unique="NORMAL" >
+				<column name="show_in_getting_started" />
+			</index>
+			<index name="idx_segment_table_id" unique="NORMAL" >
+				<column name="table_id" />
+			</index>
+			<fk name="fk_segment_ref_creator_id" to_schema="public" to_table="core_user" >
+				<fk_column name="creator_id" pk="id" />
+			</fk>
+			<fk name="fk_segment_ref_table_id" to_schema="public" to_table="metabase_table" >
+				<fk_column name="table_id" pk="id" />
+			</fk>
+		</table>
+		<table name="setting" >
+			<column name="key" type="varchar" length="254" decimal="0" jt="12" mandatory="y" />
+			<column name="value" type="text" decimal="0" jt="12" mandatory="y" />
+			<index name="setting_pkey" unique="PRIMARY_KEY" >
+				<column name="key" />
+			</index>
+		</table>
+		<table name="task_history" >
+			<comment><![CDATA[Timing and metadata info about background/quartz processes]]></comment>
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="task" type="varchar" length="254" decimal="0" jt="12" mandatory="y" >
+				<comment><![CDATA[Name of the task]]></comment>
+			</column>
+			<column name="db_id" type="integer" length="10" decimal="0" jt="4" />
+			<column name="started_at" type="timestamp" length="29" decimal="6" jt="93" mandatory="y" />
+			<column name="ended_at" type="timestamp" length="29" decimal="6" jt="93" mandatory="y" />
+			<column name="duration" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="task_details" type="text" decimal="0" jt="12" >
+				<comment><![CDATA[JSON string with additional info on the task]]></comment>
+			</column>
+			<index name="task_history_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_task_history_db_id" unique="NORMAL" >
+				<column name="db_id" />
+			</index>
+			<index name="idx_task_history_end_time" unique="NORMAL" >
+				<column name="ended_at" />
+			</index>
+		</table>
+		<table name="view_log" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="user_id" type="integer" length="10" decimal="0" jt="4" />
+			<column name="model" type="varchar" length="16" decimal="0" jt="12" mandatory="y" />
+			<column name="model_id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="timestamp" type="timestamptz" length="35" decimal="6" jt="93" mandatory="y" />
+			<index name="view_log_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_view_log_timestamp" unique="NORMAL" >
+				<column name="model_id" />
+			</index>
+			<index name="idx_view_log_user_id" unique="NORMAL" >
+				<column name="user_id" />
+			</index>
+			<fk name="fk_view_log_ref_user_id" to_schema="public" to_table="core_user" >
+				<fk_column name="user_id" pk="id" />
+			</fk>
+		</table>
+		<sequence name="activity_id_seq" start="1" />
+		<sequence name="card_label_id_seq" start="1" />
+		<sequence name="collection_id_seq" start="1" />
+		<sequence name="collection_revision_id_seq" start="1" />
+		<sequence name="computation_job_id_seq" start="1" />
+		<sequence name="computation_job_result_id_seq" start="1" />
+		<sequence name="core_user_id_seq" start="1" />
+		<sequence name="dashboard_favorite_id_seq" start="1" />
+		<sequence name="dashboardcard_series_id_seq" start="1" />
+		<sequence name="dependency_id_seq" start="1" />
+		<sequence name="dimension_id_seq" start="1" />
+		<sequence name="label_id_seq" start="1" />
+		<sequence name="metabase_database_id_seq" start="1" />
+		<sequence name="metabase_field_id_seq" start="1" />
+		<sequence name="metabase_fieldvalues_id_seq" start="1" />
+		<sequence name="metabase_table_id_seq" start="1" />
+		<sequence name="metric_id_seq" start="1" />
+		<sequence name="metric_important_field_id_seq" start="1" />
+		<sequence name="permissions_group_id_seq" start="1" />
+		<sequence name="permissions_group_membership_id_seq" start="1" />
+		<sequence name="permissions_id_seq" start="1" />
+		<sequence name="permissions_revision_id_seq" start="1" />
+		<sequence name="pulse_card_id_seq" start="1" />
+		<sequence name="pulse_channel_id_seq" start="1" />
+		<sequence name="pulse_channel_recipient_id_seq" start="1" />
+		<sequence name="pulse_id_seq" start="1" />
+		<sequence name="query_execution_id_seq" start="1" />
+		<sequence name="report_card_id_seq" start="1" />
+		<sequence name="report_cardfavorite_id_seq" start="1" />
+		<sequence name="report_dashboard_id_seq" start="1" />
+		<sequence name="report_dashboardcard_id_seq" start="1" />
+		<sequence name="revision_id_seq" start="1" />
+		<sequence name="segment_id_seq" start="1" />
+		<sequence name="task_history_id_seq" start="1" />
+		<sequence name="view_log_id_seq" start="1" />
+	</schema>
+	<connector name="metabase" database="PostgreSQL" driver_class="org.postgresql.Driver" driver_jar="postgresql-42.1.4.jar" driver_desc="Standard" host="localhost" port="5432" instance="metabase" user="postgres" passwd="c2VjcmV0MTIz" />
+	<layout name="public" id="Layout_4f3a667" show_relation="columns" >
+		<entity schema="public" name="activity" color="bfbff5" x="645" y="45" />
+		<entity schema="public" name="card_label" color="bfd4f5" x="360" y="345" />
+		<entity schema="public" name="collection" color="bfd4f5" x="825" y="975" />
+		<entity schema="public" name="collection_revision" color="f5ddbf" x="1425" y="105" />
+		<entity schema="public" name="computation_job" color="c8f5bf" x="255" y="75" />
+		<entity schema="public" name="computation_job_result" color="c8f5bf" x="420" y="75" />
+		<entity schema="public" name="core_session" color="bfd4f5" x="1020" y="465" />
+		<entity schema="public" name="core_user" color="bfd4f5" x="840" y="615" />
+		<entity schema="public" name="dashboard_favorite" color="f5ddbf" x="870" y="1620" />
+		<entity schema="public" name="dashboardcard_series" color="f5ddbf" x="1065" y="1245" />
+		<entity schema="public" name="data_migrations" color="f5ddbf" x="795" y="2370" />
+		<entity schema="public" name="databasechangelog" color="c8f5bf" x="2505" y="1395" />
+		<entity schema="public" name="databasechangeloglock" color="c8f5bf" x="2310" y="1395" />
+		<entity schema="public" name="dependency" color="f5ddbf" x="945" y="2370" />
+		<entity schema="public" name="dimension" color="c8f5bf" x="1650" y="1080" />
+		<entity schema="public" name="label" color="bfd4f5" x="495" y="345" />
+		<entity schema="public" name="metabase_database" color="c8f5bf" x="1875" y="990" />
+		<entity schema="public" name="metabase_field" color="c8f5bf" x="1455" y="630" />
+		<entity schema="public" name="metabase_fieldvalues" color="c8f5bf" x="1440" y="1080" />
+		<entity schema="public" name="metabase_table" color="c8f5bf" x="1650" y="630" />
+		<entity schema="public" name="metric" color="c8f5bf" x="1875" y="630" />
+		<entity schema="public" name="metric_important_field" color="c8f5bf" x="2100" y="630" />
+		<entity schema="public" name="permissions" color="d2bff5" x="225" y="1005" />
+		<entity schema="public" name="permissions_group" color="d2bff5" x="225" y="870" />
+		<entity schema="public" name="permissions_group_membership" color="d2bff5" x="390" y="870" />
+		<entity schema="public" name="permissions_revision" color="d2bff5" x="45" y="1005" />
+		<entity schema="public" name="pulse" color="bfd4f5" x="660" y="690" />
+		<entity schema="public" name="pulse_card" color="bfd4f5" x="660" y="975" />
+		<entity schema="public" name="pulse_channel" color="bfd4f5" x="840" y="345" />
+		<entity schema="public" name="pulse_channel_recipient" color="bfd4f5" x="645" y="465" />
+		<entity schema="public" name="qrtz_blob_triggers" color="bfbff5" x="255" y="1740" />
+		<entity schema="public" name="qrtz_calendars" color="bfbff5" x="90" y="1245" />
+		<entity schema="public" name="qrtz_cron_triggers" color="bfbff5" x="420" y="1740" />
+		<entity schema="public" name="qrtz_fired_triggers" color="f5ddbf" x="900" y="2805" />
+		<entity schema="public" name="qrtz_job_details" color="bfbff5" x="420" y="1395" />
+		<entity schema="public" name="qrtz_locks" color="bfbff5" x="255" y="1260" />
+		<entity schema="public" name="qrtz_paused_trigger_grps" color="f5ddbf" x="1095" y="2970" />
+		<entity schema="public" name="qrtz_scheduler_state" color="bfbff5" x="255" y="1935" />
+		<entity schema="public" name="qrtz_simple_triggers" color="bfbff5" x="75" y="1740" />
+		<entity schema="public" name="qrtz_simprop_triggers" color="bfbff5" x="75" y="1425" />
+		<entity schema="public" name="qrtz_triggers" color="bfbff5" x="255" y="1395" />
+		<entity schema="public" name="query" color="f5ddbf" x="735" y="2505" />
+		<entity schema="public" name="query_cache" color="f5ddbf" x="945" y="2655" />
+		<entity schema="public" name="query_execution" color="f5ddbf" x="1095" y="2655" />
+		<entity schema="public" name="report_card" color="bfd4f5" x="1020" y="615" />
+		<entity schema="public" name="report_cardfavorite" color="bfd4f5" x="1215" y="615" />
+		<entity schema="public" name="report_dashboard" color="f5ddbf" x="645" y="1245" />
+		<entity schema="public" name="report_dashboardcard" color="f5ddbf" x="870" y="1245" />
+		<entity schema="public" name="revision" color="d2bff5" x="2310" y="345" />
+		<entity schema="public" name="segment" color="c8f5bf" x="1425" y="345" />
+		<entity schema="public" name="setting" color="f5ddbf" x="675" y="2370" />
+		<entity schema="public" name="task_history" color="f5ddbf" x="645" y="2160" />
+		<entity schema="public" name="view_log" color="bfd4f5" x="2310" y="1170" />
+	</layout>
+</project>
