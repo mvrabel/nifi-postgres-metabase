@@ -4903,7 +4903,6 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/paths/~1webhooks/post/responses/400/content/application~1json/schema'
               example:
                 status: error
                 success: false
