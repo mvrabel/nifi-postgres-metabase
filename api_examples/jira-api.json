@@ -34899,7 +34899,7 @@
             }
           },
           "externalUuid": {
-            "type": "string",
+            "type": "string"
           }
         },
         "additionalProperties": false
