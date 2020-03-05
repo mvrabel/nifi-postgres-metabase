@@ -4834,6 +4834,7 @@ paths:
             application/json:
               schema:
                 allOf:
+                  - $ref: '#/paths/~1webhooks~1%7Bid%7D/delete/responses/200/content/application~1json/schema'
                   - type: object
                     properties:
                       errors:
