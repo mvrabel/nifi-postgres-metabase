@@ -26412,7 +26412,6 @@
           "uuid": {
             "type": "string",
             "description": "Unique ID for next-gen projects.",
-            "format": "uuid",
             "readOnly": true
           },
           "insight": {
@@ -26778,7 +26777,6 @@
           "entityId": {
             "type": "string",
             "description": "Unique ID for next-gen projects.",
-            "format": "uuid",
             "readOnly": true
           },
           "scope": {
@@ -26851,7 +26849,7 @@
         "properties": {
           "jqlFilter": {
             "type": "string",
-            "description": "The JQL filter that specifies which issues the webhook is sent for. Only a subset of JQL can be used. The supported elements are:\n\n *  Fields: `issueKey`, `project`, `issuetype`, `status`, `assignee`, `reporter`, `issue.property`, and `cf[id]` (for custom fieldsâ€”only the epic label custom field is supported).\n *  Operators: `=`, `!=`, `IN`, and `NOT IN`."
+            "description": "The JQL filter that specifies which issues the webhook is sent for. Only a subset of JQL can be used. The supported elements are:\n\n *  Fields: `issueKey`, `project`, `issuetype`, `status`, `assignee`, `reporter`, `issue.property`, and `cf[id]` (for custom fields—only the epic label custom field is supported).\n *  Operators: `=`, `!=`, `IN`, and `NOT IN`."
           },
           "events": {
             "type": "array",
@@ -28105,7 +28103,6 @@
           "entityId": {
             "type": "string",
             "description": "Unique ID for next-gen projects.",
-            "format": "uuid",
             "readOnly": true
           },
           "scope": {
@@ -32840,7 +32837,7 @@
           },
           "displayName": {
             "type": "string",
-            "description": "The display name of the role actor. For users, depending on the userâ€™s privacy setting, this may return an alternative value for the user's name.",
+            "description": "The display name of the role actor. For users, depending on the user’s privacy setting, this may return an alternative value for the user's name.",
             "readOnly": true
           },
           "type": {
@@ -33249,7 +33246,7 @@
           },
           "displayName": {
             "type": "string",
-            "description": "The display name of the user. Depending on the userâ€™s privacy setting, this may be returned as null."
+            "description": "The display name of the user. Depending on the user’s privacy setting, this may be returned as null."
           },
           "avatarUrl": {
             "type": "string",
@@ -33831,7 +33828,7 @@
         "type": "object",
         "properties": {
           "value": {
-            "description": "The value of the evaluated expression. It may be a primitive JSON value or a Jira REST API object. (Some expressions do not produce any meaningful resultsâ€”for example, an expression that returns a lambda functionâ€”if that's the case a simple string representation is returned. These string representations should not be relied upon and may change without notice.)"
+            "description": "The value of the evaluated expression. It may be a primitive JSON value or a Jira REST API object. (Some expressions do not produce any meaningful results—for example, an expression that returns a lambda function—if that's the case a simple string representation is returned. These string representations should not be relied upon and may change without notice.)"
           },
           "meta": {
             "description": "Contains various characteristics of the performed expression evaluation.",
@@ -34665,7 +34662,7 @@
           },
           "emailAddress": {
             "type": "string",
-            "description": "The email address of the user. Depending on the userâ€™s privacy settings, this may be returned as null.",
+            "description": "The email address of the user. Depending on the user’s privacy settings, this may be returned as null.",
             "readOnly": true
           },
           "avatarUrls": {
@@ -34679,7 +34676,7 @@
           },
           "displayName": {
             "type": "string",
-            "description": "The display name of the user. Depending on the userâ€™s privacy settings, this may return an alternative value.",
+            "description": "The display name of the user. Depending on the user’s privacy settings, this may return an alternative value.",
             "readOnly": true
           },
           "active": {
@@ -34689,7 +34686,7 @@
           },
           "timeZone": {
             "type": "string",
-            "description": "The time zone specified in the user's profile. Depending on the userâ€™s privacy settings, this may be returned as null.",
+            "description": "The time zone specified in the user's profile. Depending on the user’s privacy settings, this may be returned as null.",
             "readOnly": true
           },
           "accountType": {
@@ -34903,7 +34900,6 @@
           },
           "externalUuid": {
             "type": "string",
-            "format": "uuid"
           }
         },
         "additionalProperties": false
@@ -35648,7 +35644,7 @@
           },
           "emailAddress": {
             "type": "string",
-            "description": "The email address of the user. Depending on the userâ€™s privacy setting, this may be returned as null.",
+            "description": "The email address of the user. Depending on the user’s privacy setting, this may be returned as null.",
             "readOnly": true
           },
           "avatarUrls": {
@@ -35662,7 +35658,7 @@
           },
           "displayName": {
             "type": "string",
-            "description": "The display name of the user. Depending on the userâ€™s privacy setting, this may return an alternative value.",
+            "description": "The display name of the user. Depending on the user’s privacy setting, this may return an alternative value.",
             "readOnly": true
           },
           "active": {
@@ -35672,12 +35668,12 @@
           },
           "timeZone": {
             "type": "string",
-            "description": "The time zone specified in the user's profile. Depending on the userâ€™s privacy setting, this may be returned as null.",
+            "description": "The time zone specified in the user's profile. Depending on the user’s privacy setting, this may be returned as null.",
             "readOnly": true
           },
           "locale": {
             "type": "string",
-            "description": "The locale of the user. Depending on the userâ€™s privacy setting, this may be returned as null.",
+            "description": "The locale of the user. Depending on the user’s privacy setting, this may be returned as null.",
             "readOnly": true
           },
           "groups": {
@@ -35981,7 +35977,6 @@
           "entityId": {
             "type": "string",
             "description": "The ID of the issue type hierarchy level.",
-            "format": "uuid",
             "readOnly": true
           },
           "level": {
@@ -36044,7 +36039,7 @@
           },
           "displayName": {
             "type": "string",
-            "description": "The display name of the user. Depending on the userâ€™s privacy setting, this may return an alternative value."
+            "description": "The display name of the user. Depending on the user’s privacy setting, this may return an alternative value."
           },
           "active": {
             "type": "boolean",
@@ -36797,7 +36792,7 @@
       {
         "title": "Expansion, pagination, and ordering",
         "anchor": "expansion",
-        "body": "### Expansion\n\nThe Jira REST API uses resource expansion, which means that some parts of a resource are not returned unless specified \nin the request. This simplifies responses and minimizes network traffic.\n\nTo expand part of a resource in a request, use the expand query parameter and specify the object(s) to be expanded. \nIf you need to expand nested objects, use the `.` dot notation. If you need to expand multiple objects, use a \ncomma-separated list. \n\nFor example, the following request expands the `names` and `renderedFields` properties for the _JRACLOUD-34423_ issue:\n\n`GET issue/JRACLOUD-34423?expand=names,renderedFields`\n\nTo discover which object can be expanded, refer to the `expand` property in the object. \nIn the JSON example below, the resource declares `widgets` as expandable.\n\n```json\n{\n  \"expand\": \"widgets\", \n  \"self\": \"https://your-domain.atlassian.net/rest/api/3/resource/KEY-1\", \n  \"widgets\": {\n    \"widgets\": [],\n    \"size\": 5\n   }\n}\n```\n\n### Pagination\n\nThe Jira REST API uses pagination to improve performance. Pagination is enforced for operations that could return a large \ncollection of items. When you make a request to a paginated resource, the response wraps the returned array of values in \na JSON object with paging metadata. For example:\n\n```json\n{\n    \"startAt\" : 0,\n    \"maxResults\" : 10,\n    \"total\": 200,\n    \"isLast\": false,\n    \"values\": [\n        { /* result 0 */ },\n        { /* result 1 */ },\n        { /* result 2 */ }\n    ]\n}\n```\n\n*   `startAt` is the index of the first item returned in the page.\n*   `maxResults` is the maximum number of items that a page can return. Each operation can have a different limit for\n    the number of items returned, and these limits may change without notice. To find the maximum number of items \n    that an operation could return, set `maxResults` to a large numberâ€”for example, over 1000â€”and if the returned value of `maxResults` is less than the requested value, the returned value is the maximum.\n*    `total` is the total number of items contained in all pages. This number **_may change_** as the client \nrequests the subsequent pages, therefore the client should always assume that the requested page can be empty. Note \nthat this property is not returned for all operations.\n*   `isLast` indicates whether the page returned is the last one. Note that this property is not returned for all operations.\n\n### Ordering\n\nSome operations support ordering the elements of a response by a field. Check the documentation for the operation to \nconfirm whether ordering of a response is supported and which fields can be used. Responses are listed in ascending order \nby default. You can change the order using the `orderby` query parameter with a `-` or `+` symbol. For example:\n\n*   `?orderBy=name` to order by `name` field ascending.\n*   `?orderBy=+name` to order by `name` field ascending.\n*   `?orderBy=-name` to order by `name` field descending.\n\n\n"
+        "body": "### Expansion\n\nThe Jira REST API uses resource expansion, which means that some parts of a resource are not returned unless specified \nin the request. This simplifies responses and minimizes network traffic.\n\nTo expand part of a resource in a request, use the expand query parameter and specify the object(s) to be expanded. \nIf you need to expand nested objects, use the `.` dot notation. If you need to expand multiple objects, use a \ncomma-separated list. \n\nFor example, the following request expands the `names` and `renderedFields` properties for the _JRACLOUD-34423_ issue:\n\n`GET issue/JRACLOUD-34423?expand=names,renderedFields`\n\nTo discover which object can be expanded, refer to the `expand` property in the object. \nIn the JSON example below, the resource declares `widgets` as expandable.\n\n```json\n{\n  \"expand\": \"widgets\", \n  \"self\": \"https://your-domain.atlassian.net/rest/api/3/resource/KEY-1\", \n  \"widgets\": {\n    \"widgets\": [],\n    \"size\": 5\n   }\n}\n```\n\n### Pagination\n\nThe Jira REST API uses pagination to improve performance. Pagination is enforced for operations that could return a large \ncollection of items. When you make a request to a paginated resource, the response wraps the returned array of values in \na JSON object with paging metadata. For example:\n\n```json\n{\n    \"startAt\" : 0,\n    \"maxResults\" : 10,\n    \"total\": 200,\n    \"isLast\": false,\n    \"values\": [\n        { /* result 0 */ },\n        { /* result 1 */ },\n        { /* result 2 */ }\n    ]\n}\n```\n\n*   `startAt` is the index of the first item returned in the page.\n*   `maxResults` is the maximum number of items that a page can return. Each operation can have a different limit for\n    the number of items returned, and these limits may change without notice. To find the maximum number of items \n    that an operation could return, set `maxResults` to a large number—for example, over 1000—and if the returned value of `maxResults` is less than the requested value, the returned value is the maximum.\n*    `total` is the total number of items contained in all pages. This number **_may change_** as the client \nrequests the subsequent pages, therefore the client should always assume that the requested page can be empty. Note \nthat this property is not returned for all operations.\n*   `isLast` indicates whether the page returned is the last one. Note that this property is not returned for all operations.\n\n### Ordering\n\nSome operations support ordering the elements of a response by a field. Check the documentation for the operation to \nconfirm whether ordering of a response is supported and which fields can be used. Responses are listed in ascending order \nby default. You can change the order using the `orderby` query parameter with a `-` or `+` symbol. For example:\n\n*   `?orderBy=name` to order by `name` field ascending.\n*   `?orderBy=+name` to order by `name` field ascending.\n*   `?orderBy=-name` to order by `name` field descending.\n\n\n"
       },
       {
         "title": "Special headers",
@@ -36812,7 +36807,7 @@
       {
         "title": "Asynchronous operations",
         "anchor": "async-operations",
-        "body": "Some Jira REST API operations may trigger long-running or computationally expensive tasks. In these cases, the operation \nwill schedule an asynchronous task and return a `303 (See Other)` response, indicating the location of the queued task \nin the `Location` header. You can query this task to get progress updates.\n\nWhen the task finishes, the response object will contain the `result` field. The content of the field is specific to the \noperation that created the task. Refer to the operationâ€™s documentation for more information.\n\nNote that asynchronous tasks are not guaranteed to be run in order. In other words, if you need your tasks to execute \nin a certain order, you should start a task only after the prerequisite task(s) have finished."
+        "body": "Some Jira REST API operations may trigger long-running or computationally expensive tasks. In these cases, the operation \nwill schedule an asynchronous task and return a `303 (See Other)` response, indicating the location of the queued task \nin the `Location` header. You can query this task to get progress updates.\n\nWhen the task finishes, the response object will contain the `result` field. The content of the field is specific to the \noperation that created the task. Refer to the operation’s documentation for more information.\n\nNote that asynchronous tasks are not guaranteed to be run in order. In other words, if you need your tasks to execute \nin a certain order, you should start a task only after the prerequisite task(s) have finished."
       },
       {
         "title": "Experimental features",
