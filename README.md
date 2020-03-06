@@ -5,11 +5,12 @@ Each compoment can be replaced by a technology of you choice. Don't like postgre
 
 # How to run it
 
-1. From root folder run.
+1. Install docker https://docs.docker.com/install/
+1. 1. From root folder run.
 `docker-compose up`
 1. Wait until the containers are running.
+1. Done :)
 
-Done :)
 
 | Container|                       Link |         Credentials |                                                       Note |
 |      --- |                        --- |                 --- |                                                        --- |
