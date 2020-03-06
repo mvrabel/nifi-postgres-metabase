@@ -1,3 +1,8 @@
+# What is it ? 
+It's a framework for small scale out-of-the-box BI infrastructure.
+
+Each compoment can be replaced by a technology of you choice. Don't like postgres ? replace it with Oracle. The principles will still be the same.
+
 # How to run it
 
 1. From root folder run.
