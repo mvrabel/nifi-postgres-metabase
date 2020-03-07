@@ -65,6 +65,23 @@ services:
     restart: always
     ports:
       - 38999:389
+
+# Mocked source systems      
+  jira-api:
+    image: danielgtaylor/apisprout:latest
+    container_name: jira-api
+    restart: always
+    ports:
+      - 8200:8000
+    command: https://raw.githubusercontent.com/mvrabel/nifi-postgres-metabase/master/api_examples/jira-api.json
+
+  pipedrive-api:
+    image: danielgtaylor/apisprout:latest
+    container_name: pipedrive-api
+    restart: always
+    ports:
+      - 8100:8000
+    command: https://raw.githubusercontent.com/mvrabel/nifi-postgres-metabase/master/api_examples/pipedrive-api.yaml
   
 volumes:
   postgres:
@@ -72,4 +89,3 @@ volumes:
   openldap:
   metabase:
   pgadmin:
- 
