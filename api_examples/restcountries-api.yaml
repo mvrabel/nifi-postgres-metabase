@@ -1,0 +1,542 @@
+swagger: '2.0'
+info:
+  title: Restcountries
+  description: API for restcountries.eu
+  version: "1.0.0"
+host: restcountries.eu
+schemes:
+  - https
+paths:
+  /rest/v2/name/{name}:
+    get:
+      tags:
+        - Rest
+      description: Get By Country Name
+      operationId: GetByCountryName
+      produces:
+        - application/json
+      parameters:
+      - name: name
+        in: path
+        description: CountryName
+        required: true
+        type: string
+        x-example: 'South Africa'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/GetAll'
+      security: []
+  /rest/v2/region/{region}:
+    get:
+      tags:
+        - Rest
+      description: Get By Region
+      operationId: GetByRegion
+      produces:
+        - application/json
+      parameters:
+      - name: region
+        in: path
+        description: Region
+        required: true
+        type: string
+        x-example: 'Europe'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/GetAll'
+      security: []
+  /rest/v2/capital/{capital}:
+    get:
+      tags:
+        - Rest
+      description: Get By Capital
+      operationId: GetByCapital
+      produces:
+        - application/json
+      parameters:
+      - name: capital
+        in: path
+        description: capital
+        required: true
+        type: string
+        x-example: 'Pretoria'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/GetAll'
+      security: []
+  /rest/v2/lang/{lang}:
+    get:
+      tags:
+        - Rest
+      description: Get By Language
+      operationId: GetByLang
+      produces:
+        - application/json
+      parameters:
+      - name: lang
+        in: path
+        description: lang
+        required: true
+        type: string
+        x-example: 'en'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/GetAll'
+      security: []
+  /rest/v2/currency/{currency}:
+    get:
+      tags:
+        - Rest
+      description: Get By Currency
+      operationId: GetByCurrency
+      produces:
+        - application/json
+      parameters:
+      - name: currency
+        in: path
+        description: currency
+        required: true
+        type: string
+        x-example: 'en'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/GetAll'
+      security: []
+  /rest/v2/alpha/{alphacode}:
+    get:
+      tags:
+        - Rest
+      description: Get By Alphacode
+      operationId: GetByAlphacode
+      produces:
+        - application/json
+      parameters:
+      - name: alphacode
+        in: path
+        description: alphacode
+        required: true
+        type: string
+        x-example: 'ZA'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/GetAll'
+      security: []
+  /rest/v2/all:
+    get:
+      tags:
+        - Rest
+      description: Get All
+      operationId: GetAll
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/GetAll'
+      security: []
+definitions:
+  Countries:
+    description: Model for Countries
+    required:
+      - alpha2Code
+    properties:
+      alpha2Code:
+        type: string
+        x-example: AF
+      alpha3Code:
+        type: string
+        x-example: AFG
+      altSpellings:
+        type: array
+        items:
+          type: string
+        x-example: '["AF", "Afġānistān"]'
+      area:
+        type: number
+        format: float
+        x-example: '652230.0'
+      borders:
+        type: array
+        items:
+          type: string
+        x-example: '["IRN", "PAK", "TKM", "UZB", "TJK", "CHN"]'
+      callingCodes:
+        type: array
+        items:
+          type: string
+        x-example: '["93"]'
+      capital:
+        type: string
+        x-example: Kabul
+      cioc:
+        type: string
+        x-example: AFG
+      currencies:
+        type: array
+        items:
+          $ref: '#/definitions/Currencies'
+        x-example: |-
+          [
+            {
+              "code": "AFN",
+              "name": "Afghan afghani",
+              "symbol": "؋"
+            }
+          ]
+      demonym:
+        type: string
+        x-example: Afghan
+      flag:
+        type: string
+        x-example: 'https://restcountries.eu/data/afg.svg'
+      gini:
+        type: number
+        format: float
+        x-example: '27.8'
+      languages:
+        type: array
+        items:
+          $ref: '#/definitions/Languages'
+        x-example: |-
+          [
+            {
+              "iso639_1": "ps",
+              "iso639_2": "pus",
+              "name": "Pashto",
+              "nativeName": "پښتو"
+            },
+            {
+              "iso639_1": "uz",
+              "iso639_2": "uzb",
+              "name": "Uzbek",
+              "nativeName": "Oʻzbek"
+            },
+            {
+              "iso639_1": "tk",
+              "iso639_2": "tuk",
+              "name": "Turkmen",
+              "nativeName": "Türkmen"
+            }
+          ]
+      latlng:
+        type: array
+        items:
+          type: number
+          format: float
+        x-example: '[33.0, 65.0]'
+      name:
+        type: string
+        x-example: Afghanistan
+      nativeName:
+        type: string
+        x-example: افغانستان
+      numericCode:
+        type: string
+        x-example: '004'
+      population:
+        type: integer
+        format: int32
+        x-example: '27657145'
+      region:
+        type: string
+        x-example: Asia
+      regionalBlocs:
+        type: array
+        items:
+          $ref: '#/definitions/RegionalBlocs'
+        x-example: |-
+          [
+            {
+              "acronym": "SAARC",
+              "name": "South Asian Association for Regional Cooperation",
+              "otherAcronyms": [
+
+              ],
+              "otherNames": [
+
+              ]
+            }
+          ]
+      subregion:
+        type: string
+        x-example: Southern Asia
+      timezones:
+        type: array
+        items:
+          type: string
+        x-example: '["UTC+04:30"]'
+      topLevelDomain:
+        type: array
+        items:
+          type: string
+        x-example: '[".af"]'
+      translations:
+        $ref: '#/definitions/Translations'
+  GetAll:
+    description: Model for GetAll
+    required:
+      - alpha2Code
+    properties:
+      alpha2Code:
+        type: string
+        x-example: AF
+      alpha3Code:
+        type: string
+        x-example: AFG
+      altSpellings:
+        type: array
+        items:
+          type: string
+        x-example: '["AF", "Afġānistān"]'
+      area:
+        type: number
+        format: float
+        x-example: '652230.0'
+      borders:
+        type: array
+        items:
+          type: string
+        x-example: '["IRN", "PAK", "TKM", "UZB", "TJK", "CHN"]'
+      callingCodes:
+        type: array
+        items:
+          type: string
+        x-example: '["93"]'
+      capital:
+        type: string
+        x-example: Kabul
+      cioc:
+        type: string
+        x-example: AFG
+      currencies:
+        type: array
+        items:
+          $ref: '#/definitions/Currencies'
+        x-example: |-
+          [
+            {
+              "code": "AFN",
+              "name": "Afghan afghani",
+              "symbol": "؋"
+            }
+          ]
+      demonym:
+        type: string
+        x-example: Afghan
+      flag:
+        type: string
+        x-example: 'https://restcountries.eu/data/afg.svg'
+      gini:
+        type: number
+        format: float
+        x-example: '27.8'
+      languages:
+        type: array
+        items:
+          $ref: '#/definitions/Languages'
+        x-example: |-
+          [
+            {
+              "iso639_1": "ps",
+              "iso639_2": "pus",
+              "name": "Pashto",
+              "nativeName": "پښتو"
+            },
+            {
+              "iso639_1": "uz",
+              "iso639_2": "uzb",
+              "name": "Uzbek",
+              "nativeName": "Oʻzbek"
+            },
+            {
+              "iso639_1": "tk",
+              "iso639_2": "tuk",
+              "name": "Turkmen",
+              "nativeName": "Türkmen"
+            }
+          ]
+      latlng:
+        type: array
+        items:
+          type: number
+          format: float
+        x-example: '[33.0, 65.0]'
+      name:
+        type: string
+        x-example: Afghanistan
+      nativeName:
+        type: string
+        x-example: افغانستان
+      numericCode:
+        type: string
+        x-example: '004'
+      population:
+        type: integer
+        format: int32
+        x-example: '27657145'
+      region:
+        type: string
+        x-example: Asia
+      regionalBlocs:
+        type: array
+        items:
+          $ref: '#/definitions/RegionalBlocs'
+        x-example: |-
+          [
+            {
+              "acronym": "SAARC",
+              "name": "South Asian Association for Regional Cooperation",
+              "otherAcronyms": [
+
+              ],
+              "otherNames": [
+
+              ]
+            }
+          ]
+      subregion:
+        type: string
+        x-example: Southern Asia
+      timezones:
+        type: array
+        items:
+          type: string
+        x-example: '["UTC+04:30"]'
+      topLevelDomain:
+        type: array
+        items:
+          type: string
+        x-example: '[".af"]'
+      translations:
+        $ref: '#/definitions/Translations'
+        x-example: |-
+          {
+            "de": "Afghanistan",
+            "es": "Afganistán",
+            "fr": "Afghanistan",
+            "ja": "アフガニスタン",
+            "it": "Afghanistan",
+            "br": "Afeganistão",
+            "pt": "Afeganistão",
+            "nl": "Afghanistan",
+            "hr": "Afganistan",
+            "fa": "افغانستان"
+          }
+  RegionalBlocs:
+    description: Model for RegionalBlocs
+    required:
+      - acronym
+    properties:
+      acronym:
+        type: string
+        x-example: SAARC
+      name:
+        type: string
+        x-example: South Asian Association for Regional Cooperation
+      otherAcronyms:
+        type: array
+        items:
+          type: string
+        x-example: '[]'
+      otherNames:
+        type: array
+        items:
+          type: string
+        x-example: '[]'
+  Translations:
+    description: Model for Translations
+    required:
+      - br
+    properties:
+      br:
+        type: string
+        x-example: Afeganistão
+      de:
+        type: string
+        x-example: Afghanistan
+      es:
+        type: string
+        x-example: Afganistán
+      fa:
+        type: string
+        x-example: افغانستان
+      fr:
+        type: string
+        x-example: Afghanistan
+      hr:
+        type: string
+        x-example: Afganistan
+      it:
+        type: string
+        x-example: Afghanistan
+      ja:
+        type: string
+      nl:
+        type: string
+        x-example: Afghanistan
+      pt:
+        type: string
+        x-example: Afeganistão
+  Languages:
+    description: Model for Languages
+    required:
+      - iso639_1
+    properties:
+      iso639_1:
+        type: string
+        x-example: ps
+      iso639_2:
+        type: string
+        x-example: pus
+      name:
+        type: string
+        x-example: Pashto
+      nativeName:
+        type: string
+        x-example: پښتو
+  Currencies:
+    description: Model for Currencies
+    required:
+      - code
+    properties:
+      code:
+        type: string
+        x-example: AFN
+      name:
+        type: string
+        x-example: Afghan afghani
+      symbol:
+        type: string
+        x-example: ؋
+securityDefinitions: {}
+security: []
+tags:
+  - name: Rest
+    description: Operations about Rest
