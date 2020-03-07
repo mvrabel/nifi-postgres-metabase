@@ -18,10 +18,10 @@ Each compoment can be replaced by a technology of you choice. Don't like postgre
 |          Postgres |  http://127.0.0.1:5432     | postgres:secret123  | to view the schema I added a https://dbschema.com/ project. /postgres/dwh/dbschema_dwh_project.dbs | 
 |          Metabase |  http://127.0.0.1:3000     | You create your own |                                                            |
 |          PgAdmin  |  http://127.0.0.1:8090     | admin:admin         |                                                            |
-|          openldap |            localhost:38999 | None                |                                                            |
-|          jira-api |             localhost:8000 | None                | Mock of https://\<your server\>/rest/api/3/ API              |
-|     pipedrive-api |             localhost:8100 | None                | Mock of https://developers.pipedrive.com/docs/api/v1/ API  |
-| restcountries-api |             localhost:8200 | None                | Mock of https://restcountries.eu/ API                      |
+|          openldap |     http://127.0.0.1:38999 | None                |                                                            |
+|          jira-api |      http://127.0.0.1:8000 | None                | Mock of https://\<your server\>/rest/api/3/ API              |
+|     pipedrive-api |      http://127.0.0.1:8100 | None                | Mock of https://developers.pipedrive.com/docs/api/v1/ API  |
+| restcountries-api |      http://127.0.0.1:8200 | None                | Mock of https://restcountries.eu/ API                      |
 
 # Core Components
 
